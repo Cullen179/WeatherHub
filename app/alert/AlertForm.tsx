@@ -122,7 +122,6 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                 <td className="">
                   <FormLabel
                     key={label}
-                  
                     className="flex content-center align-middle gap-1 justify-center"
                   >
                     <span>{icon}</span>
