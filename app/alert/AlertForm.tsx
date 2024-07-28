@@ -55,7 +55,6 @@ const formSchema = z.object({
 });
 
 interface AlertSettingFormProps {
-
   onCloseForm?: () => void;
 }
 
@@ -121,7 +120,10 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                 className="border-b-2 h-16"
               >
                 <td className="">
-                  <FormLabel key={label} className="flex content-center align-middle gap-1 justify-center">
+                  <FormLabel
+                    key={label}
+                    className="flex content-center align-middle gap-1 justify-center"
+                  >
                     <span>{icon}</span>
                     {label}
                   </FormLabel>
