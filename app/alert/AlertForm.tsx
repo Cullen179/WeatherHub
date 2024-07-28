@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -13,11 +13,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
+
 import { z } from 'zod';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
-import { cn } from '@/lib/utils';
+
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   CloudLightning,
@@ -122,6 +122,7 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                 <td className="">
                   <FormLabel
                     key={label}
+                  
                     className="flex content-center align-middle gap-1 justify-center"
                   >
                     <span>{icon}</span>
