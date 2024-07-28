@@ -117,7 +117,7 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
           </thead>
           <tbody>
             {conditions.map(({ name, label, icon }) => (
-              <tr className="border-b-2 h-16">
+              <tr key={name} className="border-b-2 h-16">
                 <td className=''>
                 <FormLabel className='flex content-center align-middle gap-1 justify-center'>
                <span >
