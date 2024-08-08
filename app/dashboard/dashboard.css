@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.layout {
+  position: relative;
+}
+
+.options-column,
+.dashboard-column {
+  flex: 1;
+  padding: 20px;
+  border: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+.draggable-option {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: grab;
+}
+
+h1,
+h2,
+p {
+  margin-bottom: 20px;
+}
+
+.widget {
+  padding: 20px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
