@@ -9,15 +9,15 @@ import TestChart from './TestChart';
 const DroppableDashboard: FC = () => {
   const [widgets, setWidgets] = useState<
     { i: string; option: string; x: number; y: number; w: number; h: number }[]
-  >([]); // Widgets state, each widget has an id, option, x, y, w, and h (size)
-  const [modalContent, setModalContent] = useState<string | null>(null); // Modal content state
+  >([]); // Widgets state (including position and size)
+  const [modalContent, setModalContent] = useState<string | null>(null); // Modal content
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal open state
   const [isEditMode, setIsEditMode] = useState(false); // Edit mode state
 
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [{ isOver }, drop] = useDrop(() => ({ // Drop hook for widgets
     accept: 'widget',
-    // Drop handler
     drop: (item: { option: string }) => {
+      console.log('Dropped item:', item); 
       setWidgets((prev) => [
         ...prev,
         {
@@ -30,36 +30,33 @@ const DroppableDashboard: FC = () => {
         },
       ]);
     },
-    // Collect handler
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
   }));
 
-  const handleOpenModal = (option: string) => {
-    // Open modal only if not in edit mode
+  const handleOpenModal = (option: string) => { // Open modal with widget content
     if (!isEditMode) {
       setModalContent(option);
       setIsModalOpen(true);
     }
   };
 
-  const handleCloseModal = () => {
-    // Close modal
+  const handleCloseModal = () => { // Close modal
     setIsModalOpen(false);
     setModalContent(null);
   };
 
-  const handleToggleEditMode = () => {
-    setIsEditMode((prev) => !prev); // Toggle edit mode
+  const handleToggleEditMode = () => { // Toggle edit mode
+    setIsEditMode((prev) => !prev);
   };
 
-  const handleRemoveWidget = (widgetId: string) => {
-    setWidgets((prev) => prev.filter((widget) => widget.i !== widgetId)); // Remove widget
+  const handleRemoveWidget = (widgetId: string, e: React.MouseEvent) => { // Remove widget
+    e.stopPropagation();
+    setWidgets((prev) => prev.filter((widget) => widget.i !== widgetId));
   };
 
-  const layout = widgets.map((widget, index) => ({
-    // Map widgets to layout
+  const layout = widgets.map((widget) => ({ // Layout for widgets
     i: widget.i,
     x: widget.x,
     y: widget.y,
@@ -91,7 +88,7 @@ const DroppableDashboard: FC = () => {
           backgroundColor: isOver ? '#f0f0f0' : '#fff',
           padding: '10px',
           border: '1px solid #ddd',
-        }} // Droppable area
+        }}
       >
         <GridLayout
           className="layout"
@@ -109,9 +106,9 @@ const DroppableDashboard: FC = () => {
                 h: l.h,
               }))
             )
-          } // Update widget positions on layout change
-          isDraggable={isEditMode} // Conditionally enable dragging
-          isResizable={isEditMode} // Conditionally enable resizing
+          }
+          isDraggable={isEditMode}
+          isResizable={isEditMode}
         >
           {widgets.map((widget) => (
             <div
@@ -121,18 +118,15 @@ const DroppableDashboard: FC = () => {
                 padding: '10px',
                 border: '1px solid #ddd',
                 backgroundColor: '#f9f9f9',
-              }} // Widget component
+              }}
               onClick={() => handleOpenModal(widget.option)}
             >
               <h2>{widget.option}</h2>
               <p>Content for {widget.option}...</p>
               {isEditMode && (
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering the widget click event
-                    handleRemoveWidget(widget.i);
-                  }}
-                  style={{ marginTop: '10px' }} // Remove widget button
+                  onClick={(e) => handleRemoveWidget(widget.i, e)}
+                  style={{ marginTop: '10px' }}
                 >
                   Remove Widget
                 </button>
@@ -155,8 +149,7 @@ const DroppableDashboard: FC = () => {
         )}
       </FullScreenModal>
     </>
-    // Full screen modal with chart, replace with actual chart component
-  );
+  ); // Droppable dashboard, chart is only for demonstration
 };
 
 export default DroppableDashboard;
