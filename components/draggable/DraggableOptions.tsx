@@ -6,10 +6,11 @@ const DraggableOptions: FC<{ option: string }> = ({ option }) => {
     type: 'widget',
     item: { option },
     collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(), // Dragging state
+      isDragging: !!monitor.isDragging(),
     }),
-  })); // Drag hook
+  }));
 
+  // Draggable options, this is the component in the right column that can be dragged
   return (
     <div
       ref={drag}
@@ -24,7 +25,7 @@ const DraggableOptions: FC<{ option: string }> = ({ option }) => {
       }}
     >
       {option}
-    </div> // Draggable options
+    </div>
   );
 };
 
