@@ -5,7 +5,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react'; 
+import { useState } from 'react';
 
 export default function DashboardPage() {
   // Draggable Options Column
@@ -26,24 +26,40 @@ export default function DashboardPage() {
   return (
     <DndProvider backend={HTML5Backend}>
       <Alert>
-        <AlertTitle>Heads up!</AlertTitle>
+        <AlertTitle>Notes</AlertTitle>
         <AlertDescription>
-          <h1>
-            Drag and drop widgets from the right column to the dashboard area on
-            the left.
-          </h1>
-          <p>Click on a widget to view it in full screen.
-            Click the "Edit Widgets" button to enable/disable editing mode. In editing
-            mode, you can move widgets around the dashboard area. You can also
-            resize widgets and remove them.
-          </p>
-          <p>
-            
-          </p>
+          <ul>
+            <li>
+              Drag and drop widgets from the right column to the dashboard area
+              on the left.
+            </li>
+            <li>Click on a widget: view it in full screen modal.</li>
+            <li>
+              Click edit widgets: enable/disable editing mode.
+              <ul>
+                <li>
+                  In editing mode, you can move widgets around, resize widgets,
+                  and remove them.
+                </li>
+                <li>In non-editing mode, you can only view the widgets.</li>
+              </ul>
+            </li>
+            <li>
+              The widgets and their layout are saved to local storage.
+              Refreshing the page will restore the saved layout.
+            </li>
+            <li>Layout is still ugly.</li>
+            <li>
+              No actual data is displayed in the widgets. Replace the static
+              data with real data from an API.
+            </li>
+          </ul>
         </AlertDescription>
       </Alert>
 
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <div
+        style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+      >
         <div
           style={{
             display: 'flex',
