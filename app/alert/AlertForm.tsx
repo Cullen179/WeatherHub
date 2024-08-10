@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -25,33 +25,32 @@ import {
   Thermometer,
   Tornado,
   Wind,
+  X,
   Zap,
 } from 'lucide-react';
 
+import { Toaster, toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+
 const formSchema = z.object({
-  temperature: z.boolean().default(false).optional(),
   temperatureNoti: z.boolean().default(false).optional(),
-  temperatureRange: z.number(),
-  spark: z.boolean().default(false).optional(),
+  temperatureRange: z.array(z.number()).length(2),
+
   sparkNoti: z.boolean().default(false).optional(),
-  sparkRange: z.number(),
-  hurricane: z.boolean().default(false).optional(),
+  sparkRange: z.array(z.number()).length(2),
+
   hurricaneNoti: z.boolean().default(false).optional(),
-  hurricaneRange: z.number(),
-  fire: z.boolean().default(false).optional(),
+  hurricaneRange: z.array(z.number()).length(2),
+
   fireNoti: z.boolean().default(false).optional(),
-  fireRange: z.number(),
-  airQuality: z.boolean().default(false).optional(),
+  fireRange: z.array(z.number()).length(2),
+
   airQualityNoti: z.boolean().default(false).optional(),
-  airQualityRange: z.number(),
-  stormRisk: z.boolean().default(false).optional(),
+  airQualityRange: z.array(z.number()).length(2),
+
   stormRiskNoti: z.boolean().default(false).optional(),
-  stormRiskRange: z.number(),
-  email: z
-    .string()
-    .min(1, { message: 'This field has to be filled.' })
-    .email('This is not a valid email.'),
-  // .refine((e) => e === "abcd@fg.com", "This email is not in our database")
+  stormRiskRange: z.array(z.number()).length(2),
+  email: z.string().email(),
 });
 
 interface AlertSettingFormProps {
@@ -63,34 +62,56 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      temperature: false,
       temperatureNoti: false,
-      temperatureRange: 50,
-      spark: false,
+      temperatureRange: [25, 50], // Default range with two numbers
+
       sparkNoti: false,
-      sparkRange: 50,
-      hurricane: false,
+      sparkRange: [25, 50], // Default range with two numbers
+
       hurricaneNoti: false,
-      hurricaneRange: 50,
-      fire: false,
+      hurricaneRange: [25, 50], // Default range with two numbers
+
       fireNoti: false,
-      fireRange: 50,
-      airQuality: false,
+      fireRange: [25, 50], // Default range with two numbers
+
       airQualityNoti: false,
-      airQualityRange: 50,
-      stormRisk: false,
+      airQualityRange: [25, 50], // Default range with two numbers
+
       stormRiskNoti: false,
-      stormRiskRange: 50,
+      stormRiskRange: [25, 50], // Default range with two numbers
       email: '',
     },
   });
 
+  const { reset, getValues, setValue, resetField } = form;
+
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    if (emails.length === 0) {
+      toast.error('At least one email is required');
+      return;
+    }
+    toast.success('Form submitted successfully');
+    console.log({ ...values, emails });
   }
+  const [emails, setEmails] = useState<string[]>([]);
+
+  const onAddEmail = () => {
+    const email = getValues('email');
+    if (!email || emails.includes(email)) {
+      toast.error('Invalid or duplicate email');
+      return;
+    }
+    setEmails((prev) => [...prev, email]);
+    setValue('email', '');
+  };
+
+  const onRemoveEmail = (email: string) => {
+    setEmails((prev) => prev.filter((m) => m !== email));
+  };
+
+  const [isChecked, setIsChecked] = useState(false);
+  const [previousValue, setPreviousValue] = useState(false);
 
   const conditions = [
     { name: 'temperature', label: 'Temperature', icon: <Thermometer /> },
@@ -104,86 +125,107 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <table className="w-full rounded-md border">
-          <thead className="border-b-2 h-16">
-            <tr className="text-xl text-muted-foreground p-3">
-              <th className="max-w-32">WEATHER CONDITION</th>
-              <th>NOTIFICATION</th>
-              <th>ACCEPTABLE RANGE</th>
-              <th>AUTO</th>
-            </tr>
-          </thead>
-          <tbody>
-            {conditions.map(({ name, label, icon }) => (
-              <tr
-                key={name}
-                className="border-b-2 h-16"
-              >
-                <td className="">
-                  <FormLabel
-                    key={label}
-                    className="flex content-center align-middle gap-1 justify-center"
-                  >
-                    <span>{icon}</span>
-                    {label}
-                  </FormLabel>
-                </td>
-                <td>
-                  <FormField
-                    control={form.control}
-                    name={name as keyof z.infer<typeof formSchema>}
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-center">
-                        <FormControl>
-                          <Switch
-                            checked={field.value as boolean}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </td>
-                <td className="pr-3">
-                  <FormField
-                    control={form.control}
-                    name={`${name}Range` as keyof z.infer<typeof formSchema>}
-                    render={({ field }) => (
-                      <FormItem className="flex">
-                        <FormControl>
-                          <Slider
-                            value={[field.value as number]}
-                            onValueChange={(val) => field.onChange(val[0])}
-                            max={100}
-                            min={0}
-                            step={1}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </td>
-                <td>
-                  <FormField
-                    control={form.control}
-                    name={`${name}Noti` as keyof z.infer<typeof formSchema>}
-                    render={({ field }) => (
-                      <FormItem className="flex justify-center">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value as boolean}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none"></div>
-                      </FormItem>
-                    )}
-                  />
-                </td>
+        <div className="">
+          <table className="w-full rounded-md border">
+            <thead className="border-b-2 h-16">
+              <tr className="text-xl text-muted-foreground p-3">
+                <th className="max-w-12">
+                  <div className="mr-12">WEATHER CONDITION</div>
+                </th>
+                <th>NOTIFICATION</th>
+                <th>ACCEPTABLE RANGE</th>
+                <th>AUTO</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {conditions.map(({ name, label, icon }) => (
+                <tr
+                  key={name}
+                  className="border-b-2 h-16"
+                >
+                  <td className="">
+                    <div className="flex">
+                      <FormLabel key={label}>
+                        <div className="flex content-center items-center gap-1 ml-14">
+                          <span>{icon}</span>
+                          {label}
+                        </div>
+                      </FormLabel>
+                    </div>
+                  </td>
+                  <td>
+                    <FormField
+                      control={form.control}
+                      name={`${name}Noti` as keyof z.infer<typeof formSchema>}
+                      render={({ field }) => (
+                        <FormItem className="flex justify-center">
+                          <FormControl>
+                            <Switch
+                              checked={field.value as boolean}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none"></div>
+                        </FormItem>
+                      )}
+                    />
+                  </td>
+
+                  <td className="pr-3">
+                    <FormField
+                      control={form.control}
+                      name={`${name}Range` as keyof z.infer<typeof formSchema>}
+                      render={({ field }) => (
+                        <FormItem className="flex">
+                          <FormControl>
+                            <Slider
+                              value={field.value as [number, number]}
+                              onValueChange={(val) =>
+                                field.onChange(val as [number, number])
+                              }
+                              max={100}
+                              min={0}
+                              step={1}
+                              minStepsBetweenThumbs={0}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </td>
+
+                  <td>
+                    <div className="flex justify-center">
+                      <FormControl>
+                        <Checkbox
+                          onClick={() => {
+                            if (isChecked) {
+                              // If currently checked and clicking to uncheck, revert to previous value
+                              setIsChecked(previousValue);
+                            } else {
+                              // If currently unchecked and clicking to check, update previous value and check
+                              setPreviousValue(isChecked);
+                              setIsChecked(true);
+                            }
+                            // Perform other actions on change
+                            resetField(
+                              `${name}Range` as keyof z.infer<typeof formSchema>
+                            );
+                            resetField(
+                              `${name}Noti` as keyof z.infer<typeof formSchema>
+                            );
+                          }}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none"></div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight pt-8">
           Recipient Details
         </h2>
@@ -193,24 +235,47 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
           dicta aspernatur adipisci!
         </p>
         <div className="flex justify-center items-center gap-4 pt-4 ">
-          <p className="font-semibold">Email</p>
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem className="w-5/12">
-                <FormControl>
+                <div className="flex items-center gap-3">
+                  <FormLabel htmlFor="name">Email</FormLabel>
                   <Input
-                    type="email"
-                    className="p-4"
+                    id="email"
+                    className="flex-1 py-4"
                     placeholder="yourname@gmail.com"
                     {...field}
                   />
-                </FormControl>
+                  <Button
+                    type="button"
+                    onClick={onAddEmail}
+                    variant="secondary"
+                  >
+                    Add
+                  </Button>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
           />
+          <div className="flex items-center flex-wrap gap-1">
+            {emails.map((email) => (
+              <Badge
+                key={email}
+                variant="secondary"
+                className="flex items-center gap-1"
+              >
+                <p>{email}</p>
+                <X
+                  size={12}
+                  className="cursor-pointer"
+                  onClick={() => onRemoveEmail(email)}
+                />
+              </Badge>
+            ))}
+          </div>
         </div>
         <div className="flex gap-4 justify-end mt-12 mb-12">
           <Button
@@ -221,7 +286,10 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
           >
             Cancel
           </Button>
-          <Button type="submit">Save</Button>
+          <Button type="submit">
+            <Toaster richColors />
+            Save
+          </Button>
         </div>
       </form>
     </Form>
