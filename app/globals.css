@@ -101,3 +101,9 @@
   padding: 10px;
   cursor: pointer;
 }
+
+/* css for hover delete button in draggable/DroppableDashboard */
+
+.widget:hover .delete-button {
+  display: block;
+}
