@@ -1,16 +1,23 @@
 import { FC } from 'react';
 import { useDrag } from 'react-dnd';
 
-const DraggableWidgets: FC<{ option: string; isEditing: boolean }> = ({ option, isEditing, children }) => {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'widget',
-    item: { option },
-    canDrag: isEditing,
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
+const DraggableWidgets: FC<{ option: string; isEditing: boolean }> = ({
+  option,
+  isEditing,
+  children,
+}) => {
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: 'widget',
+      item: { option },
+      canDrag: isEditing,
+      collect: (monitor) => ({
+        isDragging: !!monitor.isDragging(),
+      }),
     }),
-  }), [isEditing]);
-    
+    [isEditing]
+  );
+
   // Return the draggable widget, this is the component that will be dragged around
   return (
     <div
@@ -26,7 +33,7 @@ const DraggableWidgets: FC<{ option: string; isEditing: boolean }> = ({ option, 
       }}
     >
       {children}
-    </div> 
+    </div>
   );
 };
 

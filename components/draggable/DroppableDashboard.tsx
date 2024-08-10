@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, MouseEvent, useRef } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
@@ -13,11 +13,12 @@ interface DroppableDashboardProps {
 }
 
 const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
+  // State for widgets on the dashboard
   const [widgets, setWidgets] = useState<
     { i: string; option: string; x: number; y: number; w: number; h: number }[]
   >([]);
   const [modalContent, setModalContent] = useState<string | null>(null); // The content to display in the modal
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [hoveredWidget, setHoveredWidget] = useState<string | null>(null);
 
   const [layoutWidth, setLayoutWidth] = useState<number>(800); // Default width
@@ -28,17 +29,34 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'widget',
     drop: (item: { option: string }) => {
-      setWidgets((prev) => [
-        ...prev,
-        {
-          i: item.option,
-          option: item.option,
-          x: prev.length % 4,
-          y: Math.floor(prev.length / 4),
-          w: 1,
-          h: 1,
-        },
-      ]);
+      setWidgets((prev) => {
+        const newWidgets = [
+          ...prev,
+          {
+            i: item.option,
+            option: item.option,
+            x: prev.length % 4,
+            y: Math.floor(prev.length / 4),
+            w: 1,
+            h: 1,
+          },
+        ];
+        // Save widgets and layout to localStorage
+        localStorage.setItem('widgets', JSON.stringify(newWidgets));
+        localStorage.setItem(
+          'layout',
+          JSON.stringify(
+            newWidgets.map((widget) => ({
+              i: widget.i,
+              x: widget.x,
+              y: widget.y,
+              w: widget.w,
+              h: widget.h,
+            }))
+          )
+        );
+        return newWidgets;
+      });
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -59,7 +77,24 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
   };
 
   const handleRemoveWidget = (widgetId: string) => {
-    setWidgets((prev) => prev.filter((widget) => widget.i !== widgetId));
+    setWidgets((prev) => {
+      const newWidgets = prev.filter((widget) => widget.i !== widgetId);
+      // Save updated widgets and layout to localStorage
+      localStorage.setItem('widgets', JSON.stringify(newWidgets));
+      localStorage.setItem(
+        'layout',
+        JSON.stringify(
+          newWidgets.map((widget) => ({
+            i: widget.i,
+            x: widget.x,
+            y: widget.y,
+            w: widget.w,
+            h: widget.h,
+          }))
+        )
+      );
+      return newWidgets;
+    });
     setHoveredWidget(null); // Clear hovered widget
   };
 
@@ -74,6 +109,8 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
         h: l.h,
       }))
     );
+    // Save updated layout to localStorage
+    localStorage.setItem('layout', JSON.stringify(layout));
   };
 
   // Calculate the layout based on the screen width
@@ -91,7 +128,37 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
 
   // Update the layout width when the dashboard width changes, responsive
   useEffect(() => {
-    const resizeObserver = new ResizeObserver(entries => {
+    // Load saved widgets and layout from localStorage
+    const savedWidgets = localStorage.getItem('widgets');
+    const savedLayout = localStorage.getItem('layout');
+
+    if (savedWidgets) {
+      const widgetsFromStorage = JSON.parse(savedWidgets);
+      setWidgets(widgetsFromStorage);
+    }
+
+    if (savedLayout) {
+      const layoutFromStorage = JSON.parse(savedLayout);
+      setWidgets((prev) =>
+        prev.map((widget) => {
+          const layoutItem = layoutFromStorage.find(
+            (l: any) => l.i === widget.i
+          );
+          return layoutItem
+            ? {
+                ...widget,
+                x: layoutItem.x,
+                y: layoutItem.y,
+                w: layoutItem.w,
+                h: layoutItem.h,
+              }
+            : widget;
+        })
+      );
+    }
+
+    // Set up ResizeObserver to handle responsive layout
+    const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         if (entry.target === dashboardRef.current) {
           setLayoutWidth(entry.contentRect.width);
@@ -108,7 +175,7 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
         resizeObserver.unobserve(dashboardRef.current);
       }
     };
-  }, [dashboardRef.current]);
+  }, []);
 
   const layout = calculateLayout();
 
@@ -144,7 +211,7 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
         {widgets.map((widget) => (
           <div
             key={widget.i}
-            className="widget"
+            className={`widget ${!isEditMode ? 'clickable' : ''}`}
             style={{
               position: 'relative',
               padding: '10px',
@@ -153,40 +220,52 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
               overflow: 'hidden',
               // Optimize performance during dragging
               willChange: 'opacity, transform',
+              cursor: !isEditMode ? 'pointer' : 'default',
+              // when not in edit mode, hover effect
+              filter:
+                !isEditMode && hoveredWidget === widget.i
+                  ? 'brightness(95%)'
+                  : 'none',
+              transition: 'background-color 0.3s ease', // Smooth transition for background color
             }}
             onClick={() => handleOpenModal(widget.option)}
             onMouseEnter={() => setHoveredWidget(widget.i)}
             onMouseLeave={() => setHoveredWidget(null)}
           >
-            <button
-              onClick={() => handleRemoveWidget(widget.i)}
-              style={{
-                position: 'absolute',
-                top: '5px',
-                right: '5px',
-                background: 'red',
-                color: 'white',
-                border: 'none',
-                borderRadius: '50%',
-                width: '20px',
-                height: '20px',
-                display: hoveredWidget === widget.i ? 'block' : 'none',
-                cursor: 'pointer',
-                fontSize: '14px',
-                textAlign: 'center',
-                lineHeight: '20px',
-                transition: 'opacity 0.2s ease',
-              }}
-            >
-              × 
-            </button> 
+            {isEditMode && (
+              <button
+                onClick={() => handleRemoveWidget(widget.i)}
+                style={{
+                  position: 'absolute',
+                  top: '5px',
+                  right: '5px',
+                  background: 'red',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '20px',
+                  height: '20px',
+                  display: hoveredWidget === widget.i ? 'block' : 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  textAlign: 'center',
+                  lineHeight: '20px',
+                  transition: 'opacity 0.2s ease',
+                }}
+              >
+                ×
+              </button>
+            )}
             <h2>{widget.option}</h2>
             <p>Content for {widget.option}...</p>
           </div>
         ))}
       </GridLayout>
 
-      <FullScreenModal isOpen={isModalOpen} onClose={handleCloseModal}>
+      <FullScreenModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      >
         {modalContent && (
           <div>
             <h1>{modalContent} Full Information</h1>
