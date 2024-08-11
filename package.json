@@ -22,7 +22,6 @@
     "@radix-ui/react-toast": "^1.2.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "firebase": "^10.12.4",
 
     "firebase": "^10.12.5",
 
