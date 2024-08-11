@@ -1,19 +1,16 @@
-import { db } from "@/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from '@/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export async function fetchAccountData(userID: string) {
-    const docRef = doc(db, "accounts", userID);
-    const docSnap = await getDoc(docRef);
+  const docRef = doc(db, 'accounts', userID);
+  const docSnap = await getDoc(docRef);
 
-    if (!docSnap.exists()) {
+  if (!docSnap.exists()) {
+    const newAccount = {};
+    await setDoc(docRef, newAccount);
 
-        const newAccount = {
+    return newAccount;
+  }
 
-        }
-        await setDoc(docRef, newAccount);
-
-        return newAccount;
-    } 
-
-    return docSnap.data();
+  return docSnap.data();
 }
