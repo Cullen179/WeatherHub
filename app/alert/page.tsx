@@ -1,7 +1,6 @@
 import { cn } from '@/lib/utils';
 import AlertForm from './AlertForm';
 
-
 export default function AlertSettings() {
   return (
     <div
