@@ -12,7 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 
 import { z } from 'zod';
 import { Switch } from '@/components/ui/switch';
@@ -25,12 +24,12 @@ import {
   Thermometer,
   Tornado,
   Wind,
-  X,
   Zap,
 } from 'lucide-react';
 
 import { Toaster, toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
+
+import { InputTags } from '@/components/ui/emailTags';
 
 const formSchema = z.object({
   temperatureNoti: z.boolean().default(false).optional(),
@@ -50,7 +49,7 @@ const formSchema = z.object({
 
   stormRiskNoti: z.boolean().default(false).optional(),
   stormRiskRange: z.array(z.number()).length(2),
-  email: z.string().email(),
+  email: z.array(z.string().email()).nonempty('At least one email is required'),
 });
 
 interface AlertSettingFormProps {
@@ -79,7 +78,7 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
 
       stormRiskNoti: false,
       stormRiskRange: [25, 50], // Default range with two numbers
-      email: '',
+      email: [],
     },
   });
 
@@ -87,28 +86,9 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    if (emails.length === 0) {
-      toast.error('At least one email is required');
-      return;
-    }
     toast.success('Form submitted successfully');
-    console.log({ ...values, emails });
+    console.log({ ...values });
   }
-  const [emails, setEmails] = useState<string[]>([]);
-
-  const onAddEmail = () => {
-    const email = getValues('email');
-    if (!email || emails.includes(email)) {
-      toast.error('Invalid or duplicate email');
-      return;
-    }
-    setEmails((prev) => [...prev, email]);
-    setValue('email', '');
-  };
-
-  const onRemoveEmail = (email: string) => {
-    setEmails((prev) => prev.filter((m) => m !== email));
-  };
 
   const [isChecked, setIsChecked] = useState(false);
   const [previousValue, setPreviousValue] = useState(false);
@@ -239,43 +219,19 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="w-5/12">
+              <FormItem>
                 <div className="flex items-center gap-3">
-                  <FormLabel htmlFor="name">Email</FormLabel>
-                  <Input
-                    id="email"
-                    className="flex-1 py-4"
-                    placeholder="yourname@gmail.com"
+                  <FormLabel>Email</FormLabel>
+                  <InputTags
+                    className="pr-8 py-4"
+                    placeholder="email@gmail.com"
                     {...field}
                   />
-                  <Button
-                    type="button"
-                    onClick={onAddEmail}
-                    variant="secondary"
-                  >
-                    Add
-                  </Button>
                 </div>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div className="flex items-center flex-wrap gap-1">
-            {emails.map((email) => (
-              <Badge
-                key={email}
-                variant="secondary"
-                className="flex items-center gap-1"
-              >
-                <p>{email}</p>
-                <X
-                  size={12}
-                  className="cursor-pointer"
-                  onClick={() => onRemoveEmail(email)}
-                />
-              </Badge>
-            ))}
-          </div>
         </div>
         <div className="flex gap-4 justify-end mt-12 mb-12">
           <Button
