@@ -49,7 +49,9 @@ const formSchema = z.object({
 
   stormRiskNoti: z.boolean().default(false).optional(),
   stormRiskRange: z.array(z.number()).length(2),
-  email: z.array(z.string().email()).nonempty('At least one email is required'),
+  email: z
+    .array(z.string().email({ message: 'Invalid email address' }))
+    .nonempty('At least one email is required'),
 });
 
 interface AlertSettingFormProps {
@@ -82,7 +84,7 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
     },
   });
 
-  const { reset, getValues, setValue, resetField } = form;
+  const { resetField } = form;
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -112,9 +114,9 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                 <th className="max-w-12">
                   <div className="mr-12">WEATHER CONDITION</div>
                 </th>
-                <th>NOTIFICATION</th>
-                <th>ACCEPTABLE RANGE</th>
-                <th>AUTO</th>
+                <th>Notification</th>
+                <th>Condition Range</th>
+                <th>Auto</th>
               </tr>
             </thead>
             <tbody>
@@ -177,25 +179,9 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                   <td>
                     <div className="flex justify-center">
                       <FormControl>
-                        <Checkbox
-                          onClick={() => {
-                            if (isChecked) {
-                              // If currently checked and clicking to uncheck, revert to previous value
-                              setIsChecked(previousValue);
-                            } else {
-                              // If currently unchecked and clicking to check, update previous value and check
-                              setPreviousValue(isChecked);
-                              setIsChecked(true);
-                            }
-                            // Perform other actions on change
-                            resetField(
-                              `${name}Range` as keyof z.infer<typeof formSchema>
-                            );
-                            resetField(
-                              `${name}Noti` as keyof z.infer<typeof formSchema>
-                            );
-                          }}
-                        />
+                        <Button type='reset' onClick={()=> resetField(name + "Range")}>
+                          Default
+                        </Button>
                       </FormControl>
                       <div className="space-y-1 leading-none"></div>
                     </div>
@@ -220,7 +206,7 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center gap-3">
+                <div className="space-y-3">
                   <FormLabel>Email</FormLabel>
                   <InputTags
                     className="pr-8 py-4"
