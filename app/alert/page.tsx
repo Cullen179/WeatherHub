@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import AlertForm from './AlertForm';
-import * as Slider from '@radix-ui/react-slider';
+
 
 export default function AlertSettings() {
   return (
