@@ -15,7 +15,6 @@ import {
 
 import { z } from 'zod';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -30,6 +29,7 @@ import {
 import { Toaster, toast } from 'sonner';
 
 import { InputTags } from '@/components/ui/emailTags';
+import { Slider } from '@/components/ui/slider';
 
 const formSchema = z.object({
   temperatureNoti: z.boolean().default(false).optional(),
