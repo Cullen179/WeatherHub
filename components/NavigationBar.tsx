@@ -17,13 +17,13 @@ export default function NavigationBar() {
         <Typography variant="h2">WeatherHub</Typography>
       </div>
       <div className="space-x-2 flex justify-between items-center">
-        {['Dashboard', 'Alert', 'Trip Planning'].map((item) => (
+        {['dashboard', 'alert', 'trip-planning'].map((item) => (
           <Link
             key={item}
-            href={'/dashboard'}
+            href={'/' + item}
             className={buttonVariants({ variant: 'ghost' })}
           >
-            {item}
+            {item.substr(0, 1).toUpperCase() + item.substr(1)}
           </Link>
         ))}
 
