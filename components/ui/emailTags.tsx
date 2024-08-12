@@ -24,8 +24,8 @@ export const InputTags = forwardRef<HTMLInputElement, InputTagsProps>(
     };
 
     return (
-      <>
-        <div className="relative flex items-center flex-wrap">
+      <div className='flex flex-col gap-3'>
+        <div className="relative flex  items-center flex-wrap">
           <Input
             value={pendingDataPoint}
             onChange={(e) => setPendingDataPoint(e.target.value)}
@@ -45,13 +45,13 @@ export const InputTags = forwardRef<HTMLInputElement, InputTagsProps>(
           <Button
             type="button"
             variant="ghost"
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-base text-gray-500 hover:bg-transparent hover:text-inherit"
+            className="absolute right-0 flex items-center px-3 text-base text-gray-500 hover:bg-transparent hover:text-inherit"
             onClick={addPendingDataPoint}
           >
             +
           </Button>
         </div>
-        <div className="overflow-y-auto p-2 flex gap-2 flex-wrap items-center">
+        <div className="flex gap-2 flex-wrap items-center">
           {value.map((item, idx) => (
             <Badge
               key={idx}
@@ -70,7 +70,7 @@ export const InputTags = forwardRef<HTMLInputElement, InputTagsProps>(
             </Badge>
           ))}
         </div>
-      </>
+      </div>
     );
   }
 );
