@@ -1,23 +1,11 @@
-import { cn } from '@/lib/utils';
 import AlertForm from './AlertForm';
-import * as Slider from '@radix-ui/react-slider';
+import { Typography } from '@/components/Typography';
 
 export default function AlertSettings() {
   return (
-    <div
-      className={cn('min-h-screen bg-background font-sans antialiased px-10')}
-    >
-      <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight lg:text-5xl mt-8">
-        Alert Settings
-      </h1>
-      <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0 mt-7">
-        Parameter Setting
-      </h2>
-      <p className="pb-5 pt-2">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos, rerum
-        delectus sint saepe cumque quidem provident laudantium. Velit maiores
-        modi dolor voluptatibus autemnis!
-      </p>
+    <div className='space-y-4'>
+      <Typography variant="h1">Alert</Typography>
+      <Typography variant="h2">Parameters Setting</Typography>
       <AlertForm />
     </div>
   );
