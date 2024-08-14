@@ -24,8 +24,8 @@ export default async function RootLayout({
 
   const weatherData = await fetchWeatherData(lat, lon);
   const forecastData = await fetchForecastData(lat, lon);
+  await Promise.all([weatherData, forecastData]);
 
-  console.log('Provider weatherData', weatherData);
   return (
     <ClerkProvider>
       <html lang="en">
