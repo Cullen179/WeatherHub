@@ -36,7 +36,7 @@ export default function Home() {
 
       const weatherData = await weatherResponse.json();
       const forecastData = await forecastResponse.json();
-      console.log(weatherData)
+      console.log(weatherData);
       setCurrentWeather(weatherData);
       setForecast(calculateDailyAverages(forecastData.list));
       setError(null);

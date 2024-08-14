@@ -1,5 +1,5 @@
 'use client';
-import { WeatherContext } from "@/hooks/WeatherContext";
+import { WeatherContext } from '@/hooks/WeatherContext';
 
 export default function WeatherProvider({
   children,
@@ -10,9 +10,8 @@ export default function WeatherProvider({
   weatherData: any;
   forecastData: any;
 }>) {
- 
   return (
-    <WeatherContext.Provider value={{weatherData, forecastData}}>
+    <WeatherContext.Provider value={{ weatherData, forecastData }}>
       {children}
     </WeatherContext.Provider>
   );

@@ -1,7 +1,9 @@
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function fetchWeatherData(lat: string, lon: string) {
-  const weatherResponse = await fetch(`${baseUrl}/api/weather?lat=${lat}&lon=${lon}`)
+  const weatherResponse = await fetch(
+    `${baseUrl}/api/weather?lat=${lat}&lon=${lon}`
+  )
     .then((res) => res.json())
     .catch((error) => {
       console.error('Failed to fetch weather data', error);
