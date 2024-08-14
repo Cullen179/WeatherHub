@@ -13,8 +13,6 @@ import { useWeather } from '@/hooks/WeatherContext';
 
 export default function Forecast() {
   const { weatherData, forecastData } = useWeather();
-  console.log('Date' + weatherData.dt * 1000);
-  console.log('Name' + weatherData.name);
 
   const calculateDailyAverages = (forecastData: any[]) => {
     const dailyData: { [key: string]: any[] } = {};
@@ -26,8 +24,6 @@ export default function Forecast() {
       }
       dailyData[date].push(item);
     });
-
-    console.log('Grouped Daily Data:', dailyData); // Debugging
 
     const dailyAverages = Object.keys(dailyData)
       .slice(1, 5)
@@ -47,7 +43,6 @@ export default function Forecast() {
         };
       });
 
-    console.log('Daily Averages:', dailyAverages); // Debugging
     return dailyAverages;
   };
 
