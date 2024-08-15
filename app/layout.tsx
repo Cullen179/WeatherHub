@@ -19,12 +19,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const lat = '10.823099';
-  const lon = '106.629662';
-
-  const weatherData = await fetchWeatherData(lat, lon);
-  const forecastData = await fetchForecastData(lat, lon);
-  await Promise.all([weatherData, forecastData]);
 
   return (
     <ClerkProvider>
@@ -36,10 +30,7 @@ export default async function RootLayout({
           )}
         >
           <NavigationBar />
-          <WeatherProvider
-            weatherData={weatherData}
-            forecastData={forecastData}
-          >
+          <WeatherProvider>
             {children}
           </WeatherProvider>
         </body>
