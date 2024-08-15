@@ -116,11 +116,13 @@ export default function Forecast() {
                     height={100}
                     alt={day.main}
                   />
-                  <p className="capitalize text-sm text-muted-foreground">{day.main}</p>
+                  <p className="capitalize text-sm text-muted-foreground">
+                    {day.main}
+                  </p>
                   <div className="flex items-center gap-2 w-full">
                     <p className="text-sm">{day.minTemp}°C </p>
                     <ConditionLevel
-                      type='Temperature'
+                      type="Temperature"
                       startNum={parseInt(day.minTemp)}
                       endNum={parseInt(day.maxTemp)}
                     />

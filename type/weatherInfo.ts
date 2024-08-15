@@ -1,7 +1,7 @@
 export const Temperature = {
-    min: 0,
-    max: 100,
-}
+  min: 0,
+  max: 100,
+};
 
 export const WeatherInfo = {
   info: [

@@ -19,7 +19,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <ClerkProvider>
       <html lang="en">
@@ -30,9 +29,7 @@ export default async function RootLayout({
           )}
         >
           <NavigationBar />
-          <WeatherProvider>
-            {children}
-          </WeatherProvider>
+          <WeatherProvider>{children}</WeatherProvider>
         </body>
       </html>
     </ClerkProvider>
