@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import {
   Card,
@@ -10,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useWeather } from '@/hooks/WeatherContext';
+import ConditionLevel from '@/components/ConditionLevel';
 
 export default function Forecast() {
   const { weatherData, forecastData } = useWeather();
@@ -100,7 +100,7 @@ export default function Forecast() {
             {calculateDailyAverages(forecastData.list).map(
               (day: any, index: number) => (
                 <Card
-                  className="flex flex-col items-center basis-1/6 drop-shadow-md rounded-md p-2"
+                  className="flex flex-col items-center basis-1/6 drop-shadow-md rounded-md py-2 px-4"
                   key={index}
                 >
                   <h2 className="font-bold">
@@ -114,19 +114,18 @@ export default function Forecast() {
                     src={`http://openweathermap.org/img/wn/${day.icon}@2x.png`}
                     width={100}
                     height={100}
-                    alt={weatherData.description}
+                    alt={day.main}
                   />
-                  <div className="flex items-center gap-2">
+                  <p className="capitalize text-sm text-muted-foreground">
+                    {day.main}
+                  </p>
+                  <div className="flex items-center gap-2 w-full">
                     <p className="text-sm">{day.minTemp}°C </p>
-                    <div
-                      style={{
-                        borderRadius: '0.25rem',
-                        height: '0.3rem',
-                        width: '4rem',
-                        background:
-                          'linear-gradient(to right, #0085FF, #FF7A00, #FF0000)',
-                      }}
-                    ></div>
+                    <ConditionLevel
+                      type="Temperature"
+                      startNum={parseInt(day.minTemp)}
+                      endNum={parseInt(day.maxTemp)}
+                    />
                     <p className="text-sm">{day.maxTemp}°C </p>
                   </div>
                 </Card>
