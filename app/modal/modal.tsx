@@ -17,91 +17,89 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-const chartData = [
-  { month: 'January', desktop: 186, mobile: 80 },
-  { month: 'February', desktop: 305, mobile: 200 },
-  { month: 'March', desktop: 237, mobile: 120 },
-  { month: 'April', desktop: 73, mobile: 190 },
-  { month: 'May', desktop: 209, mobile: 130 },
-  { month: 'June', desktop: 214, mobile: 140 },
-];
-
+import { WeatherInfoType } from '@/type/weatherInfo';
+import { useWeather } from '@/hooks/WeatherContext';
+import { SkeletonCard } from '@/components/SkeletonCard';
 const chartConfig = {
-  desktop: {
-    label: 'Desktop',
-    color: 'hsl(var(--chart-1))',
+  WeatherInfo: {
+    label: 'WeatherInfo',
   },
-  mobile: {
-    label: 'Mobile',
-    color: 'hsl(var(--chart-2))',
-  },
-} satisfies ChartConfig;
+} as ChartConfig;
 
-export default function Component() {
+export default function Modal({ info }: { info: WeatherInfoType }) {
+  const { forecastData } = useWeather();
+
+  const modalData = forecastData?.list
+    .map((item: any) => {
+      console.log(info.type + ' Info: ' + item[info.variablePath]);
+
+      if (!item[info.variablePath]) return null;
+
+      return {
+        time: new Date(item.dt * 1000).toLocaleDateString('en-US', {
+          weekday: 'short',
+          hour: 'numeric',
+        }),
+        WeatherInfo: info.subPath
+          ? item[info.variablePath][info.subPath]
+          : item[info.variablePath],
+      };
+    })
+    .filter((item: any) => item !== null);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>UV Index</CardTitle>
-        <CardDescription>
-          The UV index is a standardized measure of the strength of ultraviolet
-          (UV) radiation from the sun at a particular place and time. It is
-          designed to help people understand the potential for skin damage and
-          the need for protective measures.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value: string) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="dot" />}
-            />
-            <Area
-              dataKey="mobile"
-              type="natural"
-              fill="var(--color-mobile)"
-              fillOpacity={0.4}
-              stroke="var(--color-mobile)"
-              stackId="a"
-            />
-            <Area
-              dataKey="desktop"
-              type="natural"
-              fill="var(--color-desktop)"
-              fillOpacity={0.4}
-              stroke="var(--color-desktop)"
-              stackId="a"
-            />
-          </AreaChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              January - June 2024
+    <div>
+      {!modalData ? (
+        <SkeletonCard />
+      ) : (
+        <Card>
+          <CardContent>
+            <ChartContainer config={chartConfig}>
+              <AreaChart
+                accessibilityLayer
+                data={modalData}
+                margin={{
+                  left: 12,
+                  right: 12,
+                }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="time"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(value: string) => value}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent indicator="dot" />}
+                />
+                <Area
+                  dataKey="WeatherInfo"
+                  type="natural"
+                  fill={`hsl(${info.chartColor})`}
+                  fillOpacity={0.4}
+                  stroke={`hsl(${info.chartColor})`}
+                  stackId="a"
+                />
+              </AreaChart>
+            </ChartContainer>
+          </CardContent>
+          {/* <CardFooter>
+          <div className="flex w-full items-start gap-2 text-sm">
+            <div className="grid gap-2">
+              <div className="flex items-center gap-2 font-medium leading-none">
+                Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+              </div>
+              <div className="flex items-center gap-2 leading-none text-muted-foreground">
+                January - June 2024
+              </div>
             </div>
           </div>
-        </div>
-      </CardFooter>
-    </Card>
+        </CardFooter> */}
+        </Card>
+      )}
+    </div>
   );
 }
