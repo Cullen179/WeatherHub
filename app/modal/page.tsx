@@ -2,28 +2,35 @@
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
-    DialogContent, DialogTrigger
+    DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger
 } from '@/components/ui/dialog';
-import Modal from './modal';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { WeatherInfo } from '@/type/weatherInfo';
+import Modal from './modal';
 
-export default function DialogDemo() {
+export default function WeatherModals() {
+  // const weatherInfos = WeatherInfo.map((info) => info.type);
   return (
-    <Dialog
-      onOpenChange={(isOpen) => {
-        if (isOpen) {
-          console.log("first")
-        }
-      }}
-    >
-      <DialogTrigger asChild>
-        <Button variant="outline">Edit Profile</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[60%] p-10">
-        <ScrollArea className='h-[400px]'>
-          <Modal />
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+    <div className="grid grid-cols-3 gap-3">
+      {WeatherInfo.map((info) => (
+        <Dialog key={info.type}>
+          <DialogTrigger asChild>
+            <Button variant="outline">{info.type}</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[60%] p-10">
+            <DialogHeader>
+              <DialogTitle>{`${info.type} (${info.unit})`}</DialogTitle>
+              <DialogDescription>{info.definition}</DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="h-[400px]">
+              <Modal
+                key={info.type}
+                info={info}
+              />
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      ))}
+    </div>
   );
 }
