@@ -10,7 +10,7 @@ export default function ConditionLevel({
   endNum: number;
 }) {
   const info = WeatherInfo.find((info) => info.type === type);
-  
+
   if (!info) {
     return null;
   }

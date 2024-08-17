@@ -22,8 +22,8 @@ export default function WeatherProvider({
 
           await Promise.all([weatherData, forecastData]);
 
-          setWeatherData(w => weatherData);
-          setForecastData(f => forecastData);
+          setWeatherData((w) => weatherData);
+          setForecastData((f) => forecastData);
         },
         (error) => {
           console.error('Error getting location:', error);
