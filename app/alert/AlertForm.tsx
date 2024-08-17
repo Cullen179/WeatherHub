@@ -179,7 +179,10 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                   <td>
                     <div className="flex justify-center">
                       <FormControl>
-                        <Button type='reset' onClick={()=> resetField(name + "Range")}>
+                        <Button
+                          type="reset"
+                          onClick={() => resetField(name + 'Range')}
+                        >
                           Default
                         </Button>
                       </FormControl>
