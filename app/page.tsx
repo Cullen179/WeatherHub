@@ -1,6 +1,10 @@
-import { SignIn, SignedOut } from '@clerk/nextjs';
-import Image from 'next/image';
+import ConditionLevel from '@/components/ConditionLevel';
+import Forecast from './Forecast';
 
 export default function Home() {
-  return <div className="flex justify-center">Dashboard</div>;
+  return (
+    <div>
+      <Forecast />
+    </div>
+  );
 }
