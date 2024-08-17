@@ -87,9 +87,31 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
   const { resetField } = form;
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    toast.success('Form submitted successfully');
-    console.log({ ...values });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const response = await fetch('/api/alert-form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(
+          `Failed to submit form: ${errorData.message || response.statusText}`
+        );
+        console.error('Server error:', errorData);
+        return;
+      }
+
+      toast.success('Form submitted successfully');
+      console.log({ ...values });
+    } catch (error) {
+      toast.error('Failed to submit form');
+      console.error('Network error:', error);
+    }
   }
 
   const [isChecked, setIsChecked] = useState(false);
@@ -179,7 +201,10 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                   <td>
                     <div className="flex justify-center">
                       <FormControl>
-                        <Button type='reset' onClick={()=> resetField(name + "Range")}>
+                        <Button
+                          type="reset"
+                          onClick={() => resetField(name + 'Range')}
+                        >
                           Default
                         </Button>
                       </FormControl>
