@@ -6,7 +6,7 @@ export async function fetchAccountData(userID: string) {
   const docSnap = await getDoc(docRef);
 
   if (!docSnap.exists()) {
-    const newAccount = {};
+    const newAccount = { widgets: [] };
     await setDoc(docRef, newAccount);
 
     return newAccount;
@@ -14,3 +14,12 @@ export async function fetchAccountData(userID: string) {
 
   return docSnap.data();
 }
+
+export const saveDashboardData = async (userId: string, widgets: any[]) => {
+  try {
+    const docRef = doc(db, 'users', userId, 'dashboards', 'main');
+    await setDoc(docRef, { widgets }, { merge: true });
+  } catch (error) {
+    console.error('Error saving dashboard data:', error);
+  }
+};
