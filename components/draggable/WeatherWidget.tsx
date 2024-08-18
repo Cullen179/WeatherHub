@@ -1,7 +1,18 @@
 import { FC } from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { WeatherInfo } from '@/type/weatherInfo';
 import { WeatherInfoType } from '@/type/weatherInfo';
@@ -14,8 +25,13 @@ interface WeatherWidgetProps {
   showDescription?: boolean; // New prop to control description visibility
 }
 
-const WeatherWidget: FC<WeatherWidgetProps> = ({ option, weatherData, forecastData, showDescription = false }) => {
-  const weatherInfo = WeatherInfo.find(info => info.type === option);
+const WeatherWidget: FC<WeatherWidgetProps> = ({
+  option,
+  weatherData,
+  forecastData,
+  showDescription = false,
+}) => {
+  const weatherInfo = WeatherInfo.find((info) => info.type === option);
 
   if (!weatherInfo) {
     return <SkeletonCard />;
@@ -39,7 +55,8 @@ const WeatherWidget: FC<WeatherWidgetProps> = ({ option, weatherData, forecastDa
 
   const chartConfig: ChartConfig = {
     [option]: {
-      label: weatherInfo.type.charAt(0).toUpperCase() + weatherInfo.type.slice(1),
+      label:
+        weatherInfo.type.charAt(0).toUpperCase() + weatherInfo.type.slice(1),
     },
   };
 
@@ -52,7 +69,9 @@ const WeatherWidget: FC<WeatherWidgetProps> = ({ option, weatherData, forecastDa
           <CardHeader>
             <CardTitle className="text-lg font-semibold">{`${weatherInfo.type} (${weatherInfo.unit})`}</CardTitle>
             {showDescription && (
-              <CardDescription className="text-sm text-gray-600">{weatherInfo.definition}</CardDescription>
+              <CardDescription className="text-sm text-gray-600">
+                {weatherInfo.definition}
+              </CardDescription>
             )}
           </CardHeader>
           <CardContent>

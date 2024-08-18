@@ -1,4 +1,9 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useDrag } from 'react-dnd';
 import { FC, useEffect } from 'react';
 
@@ -12,7 +17,10 @@ const Modal = ({ isOpen, onClose, children }) => {
   }, [isOpen]);
 
   return (
-    <Dialog open={isOpen} onClose={onClose}>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+    >
       <DialogContent
         className="fixed top-0 left-0 right-0 bottom-0 m-auto bg-white p-4 z-50 overflow-auto"
         onClick={(e) => e.stopPropagation()} // Prevent modal from closing on click

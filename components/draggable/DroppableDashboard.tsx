@@ -208,9 +208,27 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
           }}
         >
           <div>
-            <button onClick={handleCloseModal} style={
-              { position: 'absolute', top: '10px', right: '10px', background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '0.8rem' }
-            }>x</button>
+            <button
+              onClick={handleCloseModal}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'red',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '20px',
+                height: '20px',
+                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '0.8rem',
+              }}
+            >
+              x
+            </button>
             {modalContent && (
               <WeatherWidget
                 option={modalContent.option}
@@ -260,7 +278,7 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
                 fontSize: '0.8rem',
                 backgroundColor: 'white',
               }}
-              onClick={() =>  !isEditMode && handleOpenModal(widget)}
+              onClick={() => !isEditMode && handleOpenModal(widget)}
             >
               <WeatherWidget
                 option={widget.option}

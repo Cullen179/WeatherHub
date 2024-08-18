@@ -63,7 +63,7 @@ export default function DashboardPage() {
         </AlertDescription>
       </Alert>
 
-      <div style={{ padding: '10px', borderBottom: '1px solid #ddd',  }}>
+      <div style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
         <p>
           <strong>Location:</strong> {location}
         </p>
@@ -109,7 +109,13 @@ export default function DashboardPage() {
 
           {/* Draggable Options Column */}
           <div style={{ width: '200px' }}>
-            <h2 style={{ fontSize: '1.2rem', marginBottom: '10px', fontWeight: 'bold' }}>
+            <h2
+              style={{
+                fontSize: '1.2rem',
+                marginBottom: '10px',
+                fontWeight: 'bold',
+              }}
+            >
               Chart List
             </h2>
             {WeatherInfo.map((info) => (

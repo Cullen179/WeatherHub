@@ -3,13 +3,17 @@
 import { FC } from 'react';
 import { useDrag } from 'react-dnd';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface DraggableOptionsProps {
   option: string;
   displayName: string;
 }
 
-const DraggableOptions: FC<DraggableOptionsProps> = ({ option, displayName }) => {
+const DraggableOptions: FC<DraggableOptionsProps> = ({
+  option,
+  displayName,
+}) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'widget',
     item: { option },
@@ -31,9 +35,10 @@ const DraggableOptions: FC<DraggableOptionsProps> = ({ option, displayName }) =>
         paddingLeft: '10px',
       }}
     >
-      <img
+      <Image
         src={`/icons/${option.toLowerCase().replace(' ', '-')}.svg`}
         style={{ marginRight: '10px' }}
+        alt={''}
       />
       {displayName}
     </Button>
