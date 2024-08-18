@@ -10,7 +10,7 @@ export default clerkMiddleware((auth, request) => {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   // Skip authentication checks in development mode
-  if (isDevelopment || isPublicRoute(request)) {
+  if (isPublicRoute(request)) {
     return;
   }
 
