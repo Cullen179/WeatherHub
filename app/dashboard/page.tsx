@@ -1,27 +1,38 @@
 'use client';
+
 import DraggableOptions from '../../components/draggable/DraggableOptions';
 import DroppableDashboard from '../../components/draggable/DroppableDashboard';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { WeatherContext } from '@/hooks/WeatherContext';
+import { WeatherInfo } from '@/type/weatherInfo';
+// styles
+import './dashboard.css';
+
+// Function to shorten weather info types
+const getDisplayName = (type: string) => {
+  const map: { [key: string]: string } = {
+    'Probability of Precipitation': 'Precipitation',
+    // Add more mappings if needed
+  };
+  return map[type] || type;
+};
 
 export default function DashboardPage() {
-  // Draggable Options Column
-  const options = [
-    'Temperature',
-    'Humidity',
-    'Wind Speed',
-    'Pressure',
-    'Precipitation',
-  ];
-
   const [isEditMode, setIsEditMode] = useState(false);
+  const { weatherData } = useContext(WeatherContext);
 
   const handleToggleEditMode = () => {
     setIsEditMode((prev) => !prev);
   };
+
+  const location = weatherData
+    ? `${weatherData.name}, ${weatherData.sys.country}`
+    : 'Loading...';
+  const currentTime = new Date().toLocaleString();
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -48,14 +59,18 @@ export default function DashboardPage() {
               The widgets and their layout are saved to local storage.
               Refreshing the page will restore the saved layout.
             </li>
-            <li>Layout is still ugly.</li>
-            <li>
-              No actual data is displayed in the widgets. Replace the static
-              data with real data from an API.
-            </li>
           </ul>
         </AlertDescription>
       </Alert>
+
+      <div style={{ padding: '10px', borderBottom: '1px solid #ddd',  }}>
+        <p>
+          <strong>Location:</strong> {location}
+        </p>
+        <p>
+          <strong>Current Time:</strong> {currentTime}
+        </p>
+      </div>
 
       <div
         style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
@@ -71,20 +86,18 @@ export default function DashboardPage() {
           }}
         >
           <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 500 }}>
-            Your Weather Dashboard
+            Dashboard
           </h1>
           <Button
-            variant="outline"
+            variant="default"
             onClick={handleToggleEditMode}
             style={{
-              color: isEditMode ? '#dc3545' : '#007bff',
-              borderColor: isEditMode ? '#dc3545' : '#007bff',
+              background: isEditMode ? 'red' : 'blue',
               padding: '8px 16px',
               cursor: 'pointer',
-              zIndex: 100,
             }}
           >
-            {isEditMode ? 'Finish Editing' : 'Edit Widgets'}
+            {isEditMode ? 'Finish Editing' : 'Edit Layout'}
           </Button>
         </div>
 
@@ -96,10 +109,14 @@ export default function DashboardPage() {
 
           {/* Draggable Options Column */}
           <div style={{ width: '200px' }}>
-            {options.map((option) => (
+            <h2 style={{ fontSize: '1.2rem', marginBottom: '10px', fontWeight: 'bold' }}>
+              Chart List
+            </h2>
+            {WeatherInfo.map((info) => (
               <DraggableOptions
-                key={option}
-                option={option}
+                key={info.type}
+                option={info.type}
+                displayName={getDisplayName(info.type)}
               />
             ))}
           </div>
