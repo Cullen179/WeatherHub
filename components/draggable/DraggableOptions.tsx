@@ -35,11 +35,11 @@ const DraggableOptions: FC<DraggableOptionsProps> = ({
         paddingLeft: '10px',
       }}
     >
-      <Image
+      {/* <Image
         src={`/icons/${option.toLowerCase().replace(' ', '-')}.svg`}
         style={{ marginRight: '10px' }}
         alt={''}
-      />
+      /> */}
       {displayName}
     </Button>
   );
