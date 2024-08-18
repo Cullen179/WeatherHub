@@ -1,7 +1,15 @@
+'use client';
+
 import { FC } from 'react';
 import { useDrag } from 'react-dnd';
+import { Button } from '@/components/ui/button';
 
-const DraggableOptions: FC<{ option: string }> = ({ option }) => {
+interface DraggableOptionsProps {
+  option: string;
+  displayName: string;
+}
+
+const DraggableOptions: FC<DraggableOptionsProps> = ({ option, displayName }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'widget',
     item: { option },
@@ -10,22 +18,25 @@ const DraggableOptions: FC<{ option: string }> = ({ option }) => {
     }),
   }));
 
-  // Draggable options, this is the component in the right column that can be dragged
   return (
-    <div
+    <Button
+      variant="outline"
       ref={drag}
       style={{
         opacity: isDragging ? 0.5 : 1,
-        padding: '10px',
-        marginBottom: '10px',
-        backgroundColor: '#f9f9f9',
-        border: '1px solid #ddd',
-        borderRadius: '4px',
         cursor: 'grab',
+        marginBottom: '10px',
+        width: '100%',
+        justifyContent: 'flex-start',
+        paddingLeft: '10px',
       }}
     >
-      {option}
-    </div>
+      <img
+        src={`/icons/${option.toLowerCase().replace(' ', '-')}.svg`}
+        style={{ marginRight: '10px' }}
+      />
+      {displayName}
+    </Button>
   );
 };
 
