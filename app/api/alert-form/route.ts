@@ -12,8 +12,8 @@ export async function GET() {
   }
 
   // Get user data from Firestore
-  const userRef = doc(db, 'users', user.id);
-  const userAlerts = await getDoc(userRef);
+  const alertSettingsRef = doc(db, 'users', user.id, 'alertSettings', 'data');
+  const userAlerts = await getDoc(alertSettingsRef);
 
   // Return user data
   if (userAlerts.exists()) {
@@ -75,8 +75,8 @@ export async function POST(req: Request) {
     };
 
     // Push form data to Firestore
-    const userRef = doc(db, 'users', user.id);
-    await setDoc(userRef, data, { merge: true });
+    const alertSettingsRef = doc(db, 'users', user.id, 'alertSettings', 'data');
+    await setDoc(alertSettingsRef, data, { merge: true });
 
     // Return success response
     return new Response(
