@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -30,6 +30,7 @@ import { Toaster, toast } from 'sonner';
 
 import { InputTags } from '@/components/ui/emailTags';
 import { Slider } from '@/components/ui/slider';
+import { fetchUserAlerts, saveUserAlerts } from './action';
 
 const formSchema = z.object({
   temperatureNoti: z.boolean().default(false).optional(),
@@ -84,33 +85,41 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
     },
   });
 
-  const { resetField } = form;
+  const { resetField, reset } = form;
+
+  // 2. Fetch the user alerts data on component mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const data = await fetchUserAlerts(); // Fetch user alerts from Firestore
+        console.log(data);
+        reset(data); // Reset form with fetched data
+      } catch (error) {
+        toast.error(`Failed to load data: ${(error as Error).message}`);
+      }
+    }
+    loadData();
+  }, [reset]);
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch('/api/alert-form', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
+      // Fetch geolocation
+      const { coords } = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(
-          `Failed to submit form: ${errorData.message || response.statusText}`
-        );
-        console.error('Server error:', errorData);
-        return;
-      }
+      // Include latitude and longitude in the form data
+      const formDataWithLocation = {
+        ...values,
+        lat: coords.latitude,
+        lon: coords.longitude,
+      };
 
+      await saveUserAlerts(formDataWithLocation); // Save form data directly to Firestore
       toast.success('Form submitted successfully');
-      console.log({ ...values });
     } catch (error) {
-      toast.error('Failed to submit form');
-      console.error('Network error:', error);
+      toast.error(`Failed to submit form: ${(error as Error).message}`);
     }
   }
 
