@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -16,7 +16,6 @@ import {
 import { z } from 'zod';
 import { Switch } from '@/components/ui/switch';
 
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   CloudLightning,
   Flame,
@@ -91,9 +90,6 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
     toast.success('Form submitted successfully');
     console.log({ ...values });
   }
-
-  const [isChecked, setIsChecked] = useState(false);
-  const [previousValue, setPreviousValue] = useState(false);
 
   const conditions = [
     { name: 'temperature', label: 'Temperature', icon: <Thermometer /> },
@@ -179,7 +175,10 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                   <td>
                     <div className="flex justify-center">
                       <FormControl>
-                        <Button type='reset' onClick={()=> resetField(name + "Range")}>
+                        <Button
+                          type="reset"
+                          onClick={() => resetField(name + 'Range')}
+                        >
                           Default
                         </Button>
                       </FormControl>

@@ -24,7 +24,7 @@ export const InputTags = forwardRef<HTMLInputElement, InputTagsProps>(
     };
 
     return (
-      <div className='flex flex-col gap-3'>
+      <div className="flex flex-col gap-3">
         <div className="relative flex  items-center flex-wrap">
           <Input
             value={pendingDataPoint}
