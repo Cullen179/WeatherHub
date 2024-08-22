@@ -3,7 +3,6 @@
 import { FC } from 'react';
 import { useDrag } from 'react-dnd';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 
 interface DraggableOptionsProps {
   option: string;
@@ -26,18 +25,13 @@ const DraggableOptions: FC<DraggableOptionsProps> = ({
     <Button
       variant="outline"
       ref={drag}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: 'grab',
-        marginBottom: '10px',
-        width: '100%',
-        justifyContent: 'flex-start',
-        paddingLeft: '10px',
-      }}
+      className={`mb-2 w-full justify-start pl-2 ${
+        isDragging ? 'opacity-50 cursor-grabbing' : 'opacity-100 cursor-grab'
+      }`}
     >
       {/* <Image
         src={`/icons/${option.toLowerCase().replace(' ', '-')}.svg`}
-        style={{ marginRight: '10px' }}
+        className="mr-2"
         alt={''}
       /> */}
       {displayName}
