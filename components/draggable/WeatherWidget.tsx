@@ -22,7 +22,8 @@ interface WeatherWidgetProps {
   option: string;
   weatherData: any;
   forecastData: any;
-  showDescription?: boolean; // New prop to control description visibility
+  showDescription?: boolean;
+  isModal?: boolean;
 }
 
 const WeatherWidget: FC<WeatherWidgetProps> = ({
@@ -30,6 +31,7 @@ const WeatherWidget: FC<WeatherWidgetProps> = ({
   weatherData,
   forecastData,
   showDescription = false,
+  isModal = false,
 }) => {
   const weatherInfo = WeatherInfo.find((info) => info.type === option);
 
@@ -61,13 +63,19 @@ const WeatherWidget: FC<WeatherWidgetProps> = ({
   };
 
   return (
-    <div>
+    <div
+      className={`w-full ${isModal ? 'bg-white' : 'border border-gray-200 bg-white'}`}
+    >
       {!modalData ? (
         <SkeletonCard />
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">{`${weatherInfo.type} (${weatherInfo.unit})`}</CardTitle>
+        <Card
+          className={`${isModal ? 'bg-white border-none shadow-none' : 'bg-white border border-gray-100 shadow-md'}`}
+        >
+          <CardHeader className="mb-2">
+            <CardTitle className="text-lg font-semibold text-gray-900">
+              {`${weatherInfo.type} (${weatherInfo.unit})`}
+            </CardTitle>
             {showDescription && (
               <CardDescription className="text-sm text-gray-600">
                 {weatherInfo.definition}
@@ -77,20 +85,21 @@ const WeatherWidget: FC<WeatherWidgetProps> = ({
           <CardContent>
             <ChartContainer config={chartConfig}>
               <AreaChart
-                accessibilityLayer
                 data={modalData}
-                margin={{
-                  left: 12,
-                  right: 12,
-                }}
+                margin={{ left: 12, right: 12 }}
+                className="w-full h-64"
               >
-                <CartesianGrid vertical={false} />
+                <CartesianGrid
+                  vertical={false}
+                  strokeDasharray="3 3"
+                />
                 <XAxis
                   dataKey="time"
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
                   tickFormatter={(value: string) => value}
+                  className="text-gray-700"
                 />
                 <ChartTooltip
                   cursor={false}
