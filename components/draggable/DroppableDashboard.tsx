@@ -7,35 +7,42 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import WeatherWidget from './WeatherWidget';
 import { useWeather } from '@/hooks/WeatherContext';
-import { saveDashboardData } from '@/app/database/fetch';
 import { useUser } from '@clerk/nextjs';
+import { WeatherInfo } from '@/type/weatherInfo';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog';
-import { doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
-import { db } from '@/firebase'; // Import the initialized Firestore instance
+import { SkeletonCard } from '@/components/SkeletonCard';
+import { saveDashboardData } from '@/app/database/save';
+import { fetchAccountData } from '@/app/database/fetch';
 
 interface DroppableDashboardProps {
   isEditMode: boolean;
+  onWidgetAdd: (option: string) => void;
+  onWidgetRemove: (option: string) => void;
+  setAvailableOptions: (options: WeatherInfo[]) => void;
 }
 
-const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
+const DroppableDashboard: FC<DroppableDashboardProps> = ({
+  isEditMode,
+  onWidgetAdd,
+  onWidgetRemove,
+  setAvailableOptions,
+}) => {
   const [widgets, setWidgets] = useState<
     { i: string; option: string; x: number; y: number; w: number; h: number }[]
   >([]);
-  const [hoveredWidget, setHoveredWidget] = useState<string | null>(null);
   const [layoutWidth, setLayoutWidth] = useState<number>(800);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<any>(null);
-  const [isModalAnimating, setIsModalAnimating] = useState(false);
-
+  const [modalInfo, setModalInfo] = useState<{
+    option: string;
+  } | null>(null);
   const dashboardRef = useRef<HTMLDivElement | null>(null);
   const { weatherData, forecastData } = useWeather();
-  const { user } = useUser(); // Use useUser to get the current user
+  const { user } = useUser();
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'widget',
@@ -57,10 +64,8 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
               h: 2.35,
             },
           ];
-          // Save widgets to local storage
-          localStorage.setItem('widgets', JSON.stringify(newWidgets));
-          // Save widgets to Firebase
           saveWidgetsToDatabase(newWidgets);
+          onWidgetAdd(item.option);
           return newWidgets;
         });
       }
@@ -73,38 +78,22 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
   const handleRemoveWidget = (widgetId: string) => {
     setWidgets((prev) => {
       const newWidgets = prev.filter((widget) => widget.i !== widgetId);
-      localStorage.setItem('widgets', JSON.stringify(newWidgets));
       saveWidgetsToDatabase(newWidgets);
+      onWidgetRemove(widgetId);
       return newWidgets;
     });
-    setHoveredWidget(null);
   };
 
   const handleLayoutChange = (layout: any[]) => {
-    setWidgets((prev) =>
-      layout.map((l) => ({
-        ...prev.find((widget) => widget.i === l.i),
-        x: l.x,
-        y: l.y,
-        w: l.w,
-        h: l.h,
-      }))
-    );
-    localStorage.setItem('layout', JSON.stringify(layout));
-    saveWidgetsToDatabase(widgets); // Save widgets with updated layout
-  };
-
-  const handleOpenModal = (widget: any) => {
-    setModalContent(widget);
-    setIsModalOpen(true);
-    setIsModalAnimating(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalAnimating(false);
-    setTimeout(() => {
-      setIsModalOpen(false);
-    }, 300); // Match the duration of the CSS transition
+    const updatedWidgets = layout.map((l) => ({
+      ...widgets.find((widget) => widget.i === l.i),
+      x: l.x,
+      y: l.y,
+      w: l.w,
+      h: l.h,
+    }));
+    setWidgets(updatedWidgets);
+    saveWidgetsToDatabase(updatedWidgets);
   };
 
   const saveWidgetsToDatabase = async (widgets: any[]) => {
@@ -113,41 +102,28 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
     }
   };
 
+  const handleWidgetClick = async (option: string) => {
+    if (!isEditMode) {
+      setModalInfo({ option });
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchWidgets = async () => {
       if (user) {
-        const docRef = doc(db, 'users', user.id, 'dashboards', 'main');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const savedData = docSnap.data();
-          setWidgets(savedData.widgets || []);
-        }
+        const accountData = await fetchAccountData(user.id);
+        const fetchedWidgets = accountData.widgets || [];
+        setWidgets(fetchedWidgets);
+        const usedOptions = fetchedWidgets.map((widget) => widget.option);
+        setAvailableOptions(
+          WeatherInfo.filter((info) => !usedOptions.includes(info.type))
+        );
       }
     };
-    fetchData();
-  }, [user]);
+    fetchWidgets();
+  }, [user, setAvailableOptions]);
 
   useEffect(() => {
-    const savedWidgets = localStorage.getItem('widgets');
-    const savedLayout = localStorage.getItem('layout');
-
-    if (savedWidgets) {
-      const widgetsFromStorage = JSON.parse(savedWidgets);
-      setWidgets(widgetsFromStorage);
-    }
-
-    if (savedLayout) {
-      const layoutFromStorage = JSON.parse(savedLayout);
-      setWidgets((prev) =>
-        prev.map((widget) => {
-          const layoutItem = layoutFromStorage.find(
-            (l: any) => l.i === widget.i
-          );
-          return layoutItem ? { ...widget, ...layoutItem } : widget;
-        })
-      );
-    }
-
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         if (entry.target === dashboardRef.current) {
@@ -167,152 +143,91 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({ isEditMode }) => {
     };
   }, []);
 
-  const layout = widgets.map((widget) => ({
-    i: widget.i,
-    x: widget.x,
-    y: widget.y,
-    w: widget.w,
-    h: widget.h,
-  }));
+  const layout = Array.isArray(widgets)
+    ? widgets.map((widget) => ({
+        i: widget.i,
+        x: widget.x,
+        y: widget.y,
+        w: widget.w,
+        h: widget.h,
+      }))
+    : [];
 
   return (
-    <>
-      {isModalOpen && (
-        <div
-          className={`modal-backdrop ${isModalAnimating ? 'visible' : 'hidden'}`}
-          onClick={handleCloseModal}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent black
-            zIndex: 1000,
-          }}
-        />
-      )}
-
-      {isModalOpen && (
-        <div
-          className={`modal ${isModalAnimating ? '' : 'hidden'}`}
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 1001,
-            maxWidth: '80%',
-            backgroundColor: 'white',
-            boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-          }}
-        >
-          <div>
-            <button
-              onClick={handleCloseModal}
-              style={{
-                position: 'absolute',
-                top: '10px',
-                right: '10px',
-                background: 'red',
-                color: 'white',
-                border: 'none',
-                borderRadius: '50%',
-                width: '20px',
-                height: '20px',
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontSize: '0.8rem',
-              }}
-            >
-              x
-            </button>
-            {modalContent && (
-              <WeatherWidget
-                option={modalContent.option}
-                weatherData={weatherData}
-                forecastData={forecastData}
-                showDescription={true}
-              />
-            )}
-          </div>
-        </div>
-      )}
-
-      <div
-        ref={(el) => {
-          drop(el);
-          dashboardRef.current = el;
-        }}
-        style={{
-          minHeight: '500px',
-          backgroundColor: isOver ? '#f0f0f0' : '#fff',
-          padding: '10px',
-          border: '1px solid #ddd',
-          position: 'relative',
-          overflow: 'auto',
-          maxHeight: '100vh',
-        }}
+    <div
+      ref={(el) => {
+        drop(el);
+        dashboardRef.current = el;
+      }}
+      className={`relative min-h-[500px] bg-white p-2 border border-gray-300 overflow-auto max-h-screen ${
+        isOver ? 'bg-gray-100' : ''
+      }`}
+    >
+      <GridLayout
+        className="layout"
+        layout={layout}
+        cols={6}
+        rowHeight={140}
+        width={layoutWidth}
+        onLayoutChange={handleLayoutChange}
+        isDraggable={isEditMode}
+        isResizable={isEditMode}
       >
-        <GridLayout
-          className="layout"
-          layout={layout}
-          cols={6}
-          rowHeight={140}
-          width={layoutWidth}
-          onLayoutChange={handleLayoutChange}
-          isDraggable={isEditMode}
-          isResizable={isEditMode}
-        >
-          {widgets.map((widget) => (
-            <div
-              key={widget.i}
-              className={`widget ${!isEditMode ? 'clickable' : ''}`}
-              onMouseEnter={() => setHoveredWidget(widget.i)}
-              onMouseLeave={() => setHoveredWidget(null)}
-              style={{
-                position: 'relative',
-                cursor: !isEditMode ? 'pointer' : 'grab',
-                fontSize: '0.8rem',
-                backgroundColor: 'white',
-              }}
-              onClick={() => !isEditMode && handleOpenModal(widget)}
-            >
+        {widgets.map((widget) => (
+          <div
+            key={widget.i}
+            className={`relative bg-white ${
+              isEditMode ? 'cursor-grab' : 'cursor-pointer'
+            }`}
+            onClick={() => handleWidgetClick(widget.option)}
+          >
+            {weatherData ? (
               <WeatherWidget
                 option={widget.option}
                 weatherData={weatherData}
                 forecastData={forecastData}
               />
-              {isEditMode && (
-                <button
-                  onClick={() => handleRemoveWidget(widget.i)}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    background: 'red',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '20px',
-                    height: '20px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    fontSize: '1rem',
-                  }}
-                >
+            ) : (
+              <SkeletonCard />
+            )}
+            {isEditMode && (
+              <div
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={() => handleRemoveWidget(widget.i)}
+                className="absolute top-0 right-0 flex items-center justify-center"
+              >
+                <button className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
                   x
                 </button>
-              )}
-            </div>
-          ))}
-        </GridLayout>
-      </div>
-    </>
+              </div>
+            )}
+          </div>
+        ))}
+      </GridLayout>
+
+      {modalInfo && (
+        <Dialog
+          open={!!modalInfo}
+          onOpenChange={() => setModalInfo(null)}
+        >
+          <DialogContent className="sm:max-w-[580px]">
+            <DialogHeader>
+              <DialogTitle>Widget Details</DialogTitle>
+              <DialogDescription>
+                {/* Optional description or title */}
+              </DialogDescription>
+            </DialogHeader>
+            <WeatherWidget
+              option={modalInfo.option}
+              weatherData={weatherData}
+              forecastData={forecastData}
+              showDescription
+              isModal
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+    </div>
   );
 };
 
