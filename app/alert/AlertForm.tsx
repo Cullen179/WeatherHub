@@ -18,12 +18,13 @@ import { Switch } from '@/components/ui/switch';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-  CloudLightning,
-  Flame,
   Thermometer,
-  Tornado,
+  Droplet,
+  Waves,
+  Eye,
   Wind,
-  Zap,
+  Umbrella,
+  Droplets,
 } from 'lucide-react';
 
 import { Toaster, toast } from 'sonner';
@@ -36,20 +37,23 @@ const formSchema = z.object({
   temperatureNoti: z.boolean().default(false).optional(),
   temperatureRange: z.array(z.number()).length(2),
 
-  sparkNoti: z.boolean().default(false).optional(),
-  sparkRange: z.array(z.number()).length(2),
+  humidityNoti: z.boolean().default(false).optional(),
+  humidityRange: z.array(z.number()).length(2),
 
-  hurricaneNoti: z.boolean().default(false).optional(),
-  hurricaneRange: z.array(z.number()).length(2),
+  seaPressureNoti: z.boolean().default(false).optional(),
+  seaPressureRange: z.array(z.number()).length(2),
 
-  fireNoti: z.boolean().default(false).optional(),
-  fireRange: z.array(z.number()).length(2),
+  visibilityNoti: z.boolean().default(false).optional(),
+  visibilityRange: z.array(z.number()).length(2),
 
-  airQualityNoti: z.boolean().default(false).optional(),
-  airQualityRange: z.array(z.number()).length(2),
+  windSpeedNoti: z.boolean().default(false).optional(),
+  windSpeedRange: z.array(z.number()).length(2),
 
-  stormRiskNoti: z.boolean().default(false).optional(),
-  stormRiskRange: z.array(z.number()).length(2),
+  rainChanceNoti: z.boolean().default(false).optional(),
+  rainChanceRange: z.array(z.number()).length(2),
+
+  rainVolumeNoti: z.boolean().default(false).optional(),
+  rainVolumeRange: z.array(z.number()).length(2),
   email: z
     .array(z.string().email({ message: 'Invalid email address' }))
     .nonempty('At least one email is required'),
@@ -65,22 +69,26 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       temperatureNoti: false,
-      temperatureRange: [25, 50], // Default range with two numbers
+      temperatureRange: [0, 40],
 
-      sparkNoti: false,
-      sparkRange: [25, 50], // Default range with two numbers
+      humidityNoti: false,
+      humidityRange: [30, 70], 
 
-      hurricaneNoti: false,
-      hurricaneRange: [25, 50], // Default range with two numbers
+      seaPressureNoti: false,
+      seaPressureRange: [980, 1050],
 
-      fireNoti: false,
-      fireRange: [25, 50], // Default range with two numbers
+      visibilityNoti: false,
+      visibilityRange: [1, 20],
 
-      airQualityNoti: false,
-      airQualityRange: [25, 50], // Default range with two numbers
+      windSpeedNoti: false,
+      windSpeedRange: [0, 20],
 
-      stormRiskNoti: false,
-      stormRiskRange: [25, 50], // Default range with two numbers
+      rainChanceNoti: false,
+      rainChanceRange: [0, 80],
+
+      rainVolumeNoti: false,
+      rainVolumeRange: [0, 50],
+
       email: [],
     },
   });
@@ -128,11 +136,13 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
 
   const conditions = [
     { name: 'temperature', label: 'Temperature', icon: <Thermometer /> },
-    { name: 'spark', label: 'Spark', icon: <Zap /> },
-    { name: 'hurricane', label: 'Hurricane', icon: <Tornado /> },
-    { name: 'fire', label: 'Fire', icon: <Flame /> },
-    { name: 'airQuality', label: 'Air Quality', icon: <Wind /> },
-    { name: 'stormRisk', label: 'Storm Risk', icon: <CloudLightning /> },
+    { name: 'humidity', label: 'Humidity', icon: <Droplet /> },
+    { name: 'seaPressure', label: 'Sea Pressure', icon: <Waves /> },
+    { name: 'visibility', label: 'Visibility', icon: <Eye /> },
+    { name: 'windSpeed', label: 'Wind Speed', icon: <Wind /> },
+    { name: 'rainChance', label: 'Rain Chance', icon: <Umbrella /> },
+    { name: 'rainVolume', label: 'Rain Volume', icon: <Droplets /> },
+    
   ];
 
   return (
@@ -146,8 +156,8 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                   <div className="mr-12">WEATHER CONDITION</div>
                 </th>
                 <th>Notification</th>
-                <th>Condition Range</th>
-                <th>Auto</th>
+                <th>Acceptable Range</th>
+                <th>Default</th>
               </tr>
             </thead>
             <tbody>
