@@ -1,59 +1,45 @@
 import * as React from 'react';
 
 interface EmailTemplateProps {
-  temperature?: number;
-  spark?: number;
-  hurricane?: number;
-  fire?: number;
-  airQuality?: number;
-  stormRisk?: number;
+  type: string;
+  value: number;
+  date: Date;
 }
 
 export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
-  temperature, 
-  spark,
-  hurricane,
-  fire,
-  airQuality,
-  stormRisk,
-}) => (
-  <div
-    style={{ fontFamily: 'Arial, sans-serif', color: '#333', padding: '20px' }}
-  >
-    <h1 style={{ color: '#2c3e50' }}>Weather Update</h1>
-    <p>Attention!!!, we have detected values beyond your acceptable range, see values below:</p>
-    <br />
-
-    {temperature && (
+  type,
+  value,
+  date,
+}) => {
+  return (
+    <div
+      style={{
+        fontFamily: 'Arial, sans-serif',
+        padding: '20px',
+        color: '#333',
+      }}
+    >
+      <h1 style={{ color: '#007BFF' }}>WeatherHub Alert</h1>
+      <p>Dear User,</p>
       <p>
-        <strong>Temperature:</strong> {temperature}
+        We have detected a weather condition for tomorrow that matches your
+        criteria:
       </p>
-    )}
-    {spark && (
+      <div style={{ marginBottom: '20px' }}>
+        <h2>{type.charAt(0).toUpperCase() + type.slice(1)} Alert</h2>
+        <p>
+          <strong>Value:</strong> {value}
+        </p>
+        <p>
+          <strong>Date:</strong> {date.toISOString()}
+        </p>
+      </div>
+      <p>Thank you for using WeatherHub!</p>
       <p>
-        <strong>Spark:</strong> {spark}
+        Best regards,
+        <br />
+        The WeatherHub Team
       </p>
-    )}
-    {hurricane && (
-      <p>
-        <strong>Hurricane:</strong> {hurricane}
-      </p>
-    )}
-    {fire && (
-      <p>
-        <strong>Fire:</strong> {fire}
-      </p>
-    )}
-    {airQuality && (
-      <p>
-        <strong>Air Quality:</strong> {airQuality}
-      </p>
-    )}
-    {stormRisk && (
-      <p>
-        <strong>Storm Risk:</strong> {stormRisk}
-      </p>
-    )}
-    <p>Stay safe and have a great day!</p>
-  </div>
-);
+    </div>
+  );
+};

@@ -48,34 +48,36 @@ export async function saveUserAlerts(formData: any) {
         noti: formData.temperatureNoti,
         range: formData.temperatureRange,
       },
-      sparks: {
-        noti: formData.sparkNoti,
-        range: formData.sparkRange,
+      humidity: {
+        noti: formData.humidityNoti,
+        range: formData.humidityRange,
       },
-      hurricanes: {
-        noti: formData.hurricaneNoti,
-        range: formData.hurricaneRange,
+      seaPressure: {
+        noti: formData.seaPressureNoti,
+        range: formData.seaPressureRange,
       },
-      fires: {
-        noti: formData.fireNoti,
-        range: formData.fireRange,
+      visibility: {
+        noti: formData.visibilityNoti,
+        range: formData.visibilityRange,
       },
-      airQualities: {
-        noti: formData.airQualityNoti,
-        range: formData.airQualityRange,
+      windSpeed: {
+        noti: formData.windSpeedNoti,
+        range: formData.windSpeedRange,
       },
-      stormRisks: {
-        noti: formData.stormRiskNoti,
-        range: formData.stormRiskRange,
+      rainChance: {
+        noti: formData.rainChanceNoti,
+        range: formData.rainChanceRange,
       },
-      latitude: formData.lat,
-      longitude: formData.lon,
+      rainVolume: {
+        noti: formData.rainVolumeNoti,
+        range: formData.rainVolumeRange,
+      },
+      city: formData.city,
     };
 
     // Push form data to Firestore
     const alertSettingsRef = doc(db, 'users', user.id, 'alertSettings', 'data');
     await setDoc(alertSettingsRef, data, { merge: true });
-    console.log(formData);
 
     // Return success message
     return { message: 'Data successfully saved' };

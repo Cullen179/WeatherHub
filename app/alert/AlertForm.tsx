@@ -23,8 +23,8 @@ import {
   Waves,
   Eye,
   Wind,
-  Umbrella,
   Droplets,
+  Umbrella,
 } from 'lucide-react';
 
 import { Toaster, toast } from 'sonner';
@@ -32,28 +32,29 @@ import { Toaster, toast } from 'sonner';
 import { InputTags } from '@/components/ui/emailTags';
 import { Slider } from '@/components/ui/slider';
 import { fetchUserAlerts, saveUserAlerts } from './action';
+import { fetchCity } from '../fetch';
 
 const formSchema = z.object({
   temperatureNoti: z.boolean().default(false).optional(),
-  temperatureRange: z.array(z.number()).length(2),
+  temperatureRange: z.array(z.number()).length(2), // Celsius (0 - 40)
 
   humidityNoti: z.boolean().default(false).optional(),
-  humidityRange: z.array(z.number()).length(2),
+  humidityRange: z.array(z.number()).length(2), // Percentage (30 - 70)
 
   seaPressureNoti: z.boolean().default(false).optional(),
-  seaPressureRange: z.array(z.number()).length(2),
+  seaPressureRange: z.array(z.number()).length(2), // hPa (980 - 1050)
 
   visibilityNoti: z.boolean().default(false).optional(),
-  visibilityRange: z.array(z.number()).length(2),
-
+  visibilityRange: z.array(z.number()).length(2), // km (1 - 20)
+                  
   windSpeedNoti: z.boolean().default(false).optional(),
-  windSpeedRange: z.array(z.number()).length(2),
+  windSpeedRange: z.array(z.number()).length(2), // m/s (0 - 20)
 
   rainChanceNoti: z.boolean().default(false).optional(),
-  rainChanceRange: z.array(z.number()).length(2),
+  rainChanceRange: z.array(z.number()).length(2), // % (0 - 50)
 
   rainVolumeNoti: z.boolean().default(false).optional(),
-  rainVolumeRange: z.array(z.number()).length(2),
+  rainVolumeRange: z.array(z.number()).length(2), // mm (0 - 50)
   email: z
     .array(z.string().email({ message: 'Invalid email address' }))
     .nonempty('At least one email is required'),
@@ -84,7 +85,7 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
       windSpeedRange: [0, 20],
 
       rainChanceNoti: false,
-      rainChanceRange: [0, 80],
+      rainChanceRange: [0, 50],
 
       rainVolumeNoti: false,
       rainVolumeRange: [0, 50],
@@ -117,11 +118,13 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
         navigator.geolocation.getCurrentPosition(resolve, reject);
       });
 
-      // Include latitude and longitude in the form data
+      // Include city in form data
+      console.log(coords);
+      const response = await fetchCity(coords.latitude, coords.longitude);
+      console.log(response);
       const formDataWithLocation = {
         ...values,
-        lat: coords.latitude,
-        lon: coords.longitude,
+        city: response[0].name,
       };
 
       await saveUserAlerts(formDataWithLocation); // Save form data directly to Firestore
@@ -135,14 +138,13 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
   const [previousValue, setPreviousValue] = useState(false);
 
   const conditions = [
-    { name: 'temperature', label: 'Temperature', icon: <Thermometer /> },
-    { name: 'humidity', label: 'Humidity', icon: <Droplet /> },
-    { name: 'seaPressure', label: 'Sea Pressure', icon: <Waves /> },
-    { name: 'visibility', label: 'Visibility', icon: <Eye /> },
-    { name: 'windSpeed', label: 'Wind Speed', icon: <Wind /> },
-    { name: 'rainChance', label: 'Rain Chance', icon: <Umbrella /> },
-    { name: 'rainVolume', label: 'Rain Volume', icon: <Droplets /> },
-    
+    { name: 'temperature', label: 'Temperature (°C)', icon: <Thermometer />, min: -10, max: 50 },
+    { name: 'humidity', label: 'Humidity (%)', icon: <Droplet />, min: 0, max: 100 },
+    { name: 'seaPressure', label: 'Sea Pressure (hPa)', icon: <Waves />, min: 900, max: 1100 },
+    { name: 'visibility', label: 'Visibility (km)', icon: <Eye />, min: 0, max: 10 },
+    { name: 'windSpeed', label: 'Wind Speed (m/s)', icon: <Wind />, min: 0, max: 40 },
+    { name: 'rainChance', label: 'Rain Chance (%)', icon: <Umbrella />, min: 0, max: 100 },
+    { name: 'rainVolume', label: 'Rain Volume (mm/h)', icon: <Droplets />, min: 0, max: 50 },
   ];
 
   return (
@@ -161,7 +163,7 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
               </tr>
             </thead>
             <tbody>
-              {conditions.map(({ name, label, icon }) => (
+              {conditions.map(({ name, label, icon, min, max }) => (
                 <tr
                   key={name}
                   className="border-b-2 h-16"
@@ -206,8 +208,8 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                               onValueChange={(val) =>
                                 field.onChange(val as [number, number])
                               }
-                              max={100}
-                              min={0}
+                              max={max}
+                              min={min}
                               step={1}
                               minStepsBetweenThumbs={0}
                             />
