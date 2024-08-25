@@ -1,6 +1,6 @@
 import { EmailTemplate } from '@/components/emailTemplates/email-templates';
 import { Resend } from 'resend';
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { collectionGroup, doc, getDoc, getDocs, query } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { fetchForecastData } from '@/app/fetch';
 import { Hash } from 'lucide-react';
@@ -14,49 +14,48 @@ export async function POST() {
 
   try {
     // Fetch all alert settings
-    const querySnapshot = await getDocs(collection(db, 'users'));
+    const alertSettingsRef = query(collectionGroup(db, 'alertSettings'));
+    const querySnapshot = await getDocs(alertSettingsRef);
+
+    console.log('All alert settings:', querySnapshot.docs);
 
     // Iterate over each user
-    for (const userDoc of querySnapshot.docs) {
-      const alertSettingsDoc = doc(db, 'users', userDoc.id, 'alertSettings', 'data');
-      const alertSettings = await getDoc(alertSettingsDoc);
+    for (const alertSettings of querySnapshot.docs) {
+      const data = alertSettings.data();
+      console.log('User data:', data);
+      
+      // Check if the city has already been processed
+      if (!processedCities.has(data.city)) {
+        // Fetch forecast data for the city
+        const forecastData = await fetchForecastData(undefined, undefined, data.city);
+        processedCities.set(data.city, forecastData);
 
-      if (alertSettings.exists()) {
-        const data = alertSettings.data();
-        
-        // Check if the city has already been processed
-        if (!processedCities.has(data.city)) {
-          // Fetch forecast data for the city
-          const forecastData = await fetchForecastData(data.city);
-          processedCities.set(data.city, forecastData);
+        // Check if the user needs to be notified
+        const notifications = checkNotification(data, forecastData);
 
-          // Check if the user needs to be notified
-          const notifications = checkNotification(data, forecastData);
-
-          // Add user to the list of users that need to be notified
-          if (notifications.length > 0) {
-            for (const notification of notifications) {
-              if (!dataToNotify.has(notification)) {
-                dataToNotify.set(notification, []);
-              }
-              dataToNotify.get(notification)!.push(data.emails);
+        // Add user to the list of users that need to be notified
+        if (notifications.length > 0) {
+          for (const notification of notifications) {
+            if (!dataToNotify.has(notification)) {
+              dataToNotify.set(notification, []);
             }
+            dataToNotify.get(notification)!.push(data.emails);
           }
-        } else {
-          // Use cached forecast data
-          const forecastData = processedCities.get(data.city);
+        }
+      } else {
+        // Use cached forecast data
+        const forecastData = processedCities.get(data.city);
 
-          // Check if the user needs to be notified
-          const notifications = checkNotification(data, forecastData);
+        // Check if the user needs to be notified
+        const notifications = checkNotification(data, forecastData);
 
-          // Add user to the list of users that need to be notified
-          if (notifications.length > 0) {
-            for (const notification of notifications) {
-              if (!dataToNotify.has(notification)) {
-                dataToNotify.set(notification, []);
-              }
-              dataToNotify.get(notification)!.push(data.emails);
+        // Add user to the list of users that need to be notified
+        if (notifications.length > 0) {
+          for (const notification of notifications) {
+            if (!dataToNotify.has(notification)) {
+              dataToNotify.set(notification, []);
             }
+            dataToNotify.get(notification)!.push(data.emails);
           }
         }
       }
@@ -65,6 +64,8 @@ export async function POST() {
     console.error('Failed to fetch user data:', error);
     return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 });
   }
+
+  
 
   // Send notifications to users
   try {
@@ -93,14 +94,15 @@ export async function POST() {
 // Function to check if the user needs to be notified and when to notify what data
 function checkNotification(data: any, forecastData: any) {
   // forecastData.list is an array of forecast data for the next 5 days with 3-hour intervals
-  // Check every forecast for tomorrow (7th index to 15th index)
+  // Check every forecast for tomorrow from 6 AM to 3 PM ()
   // If any forecast meets the criteria, return true along with the data that needs to be notified
   // If no forecast meets the criteria, return false
 
   const notifications = [];
-  for (let i = 7; i < 16; i++) {
+  const timeZoneDiff = forecastData.city.timezone; // Timezone difference in seconds
+  for (let i = 5; i < 10; i++) {
     const forecast = forecastData.list[i];
-    const date = new Date(forecast.dt * 1000); // Convert timestamp to date
+    const date = new Date((forecast.dt + timeZoneDiff) * 1000); // Convert timestamp to date and add the timezone difference
     const temperature = forecast.main.temp;
     const humidity = forecast.main.humidity;
     const seaPressure = forecast.main.sea_level;
@@ -108,7 +110,7 @@ function checkNotification(data: any, forecastData: any) {
     const windSpeed = forecast.wind.speed ? forecast.wind.speed : 0; // Wind speed in m/s if available
     let rainChance = forecast.pop ? forecast.pop : 0;
     rainChance *= 100; // Convert to percentage
-    const rainVolume = forecast.rain['3h'] ? forecast.rain['3h'] : 0; // Rain volume in the last 3 hours if available
+    const rainVolume = forecast.rain?.['3h'] ? forecast.rain['3h'] : 0; // Rain volume in the last 3 hours if available
 
 
     // Check if the forecast meets the criteria
