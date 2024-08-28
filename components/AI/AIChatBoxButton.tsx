@@ -1,19 +1,24 @@
 'use client';
 
-import { Bot } from 'lucide-react';
 import { FC, useState } from 'react';
-
 import AIChatBox from '../../app/AIChatBox';
-import { Button } from '../ui/button';
+import ActionIconButton from '../ui/ActionIconButton';
+import { Bot } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const AIChatButton: FC<{}> = () => {
   const [chatBoxOpen, setChatBoxOpen] = useState(false);
   return (
     <>
-      <Button
+      <ActionIconButton
+        className={cn(
+          'opacity-100 flex items-center justify-center w-12 h-12 shadow-lg rounded-full absolute bottom-4 right-4',
+          chatBoxOpen ? 'hidden' : ''
+        )}
         onClick={() => setChatBoxOpen(true)}
-        // tooltip="AI Chatbox"
-        // Icon={Bot}
+        tooltip="WeatherHub AI "
+        tooltipDescription="find answer, weather knowledge , etc."
+        Icon={Bot}
       />
       <AIChatBox
         open={chatBoxOpen}

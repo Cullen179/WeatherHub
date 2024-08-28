@@ -15,15 +15,15 @@ export default function ChatMessage({
   return (
     <div
       className={cn(
-        'mb-3 flex items-center',
+        'mb-3 flex items-center text-sm',
         isAiMessage ? 'me-5 justify-start' : 'ms-5 justify-end'
       )}
     >
       {isAiMessage && <Bot className="mr-2 shrink-0" />}
       <p
         className={cn(
-          'whitespace-pre-line rounded-md border px-3 py-2',
-          isAiMessage ? 'bg-background' : 'bg-primary text-primary-foreground'
+          'text-customTextWhite px-4 py-2',
+          isAiMessage ? 'px-1' : 'text-customTextWhite'
         )}
       >
         {content}

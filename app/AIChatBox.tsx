@@ -1,7 +1,7 @@
 'use client';
 
 import { useChat } from 'ai/react';
-import { Bot, SendHorizontal, Trash, X } from 'lucide-react';
+import { Bot, CircleArrowUp, X } from 'lucide-react';
 import { useEffect, useMemo, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,6 @@ interface AIChatBoxProps {
   open: boolean;
   onClose: () => void;
 }
-
 export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
   const { weatherData, forecastData } = useWeather();
   const {
@@ -55,25 +54,26 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
   return (
     <div
       className={cn(
-        'relative bottom-0 right-0 z-10 w-full max-w-[500px] p-1 xl:right-36',
+        'relative bottom-2 right-0 z-10 w-full max-w-[420px] p-1 xl:right-4 min-h-[365px]',
         open ? 'fixed' : 'hidden'
       )}
     >
+      <div></div>
       <Button
         onClick={onClose}
         variant="ghost"
         size="icon"
-        className="absolute right-3 top-3"
+        className="absolute right-3 top-3 bg-transparent text-muted-foreground hover:bg-transparent hover:text-muted-foreground"
       >
         <X
-          size={20}
+          size={18}
           className="stroke-muted-foreground"
         />
       </Button>
 
-      <div className="flex h-[600px] flex-col border bg-background shadow-xl rounded-xl pt-11">
+      <div className="flex h-[450px] flex-col bg-[rgba(32,32,32,0.9)] rounded-2xl pt-11">
         <div
-          className="mt-3 h-full overflow-y-auto px-3"
+          className="mt-3 h-full overflow-y-auto px-4"
           ref={scrollRef}
         >
           {messages.map((message) => (
@@ -99,41 +99,41 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
             />
           )}
           {!error && messages.length === 0 && (
-            <div className="flex flex-col h-full items-center justify-center gap-2">
-              <div className="flex gap-2">
-                <Bot className="stroke-muted-foreground" />
-                <p className="text-muted-foreground">Ask AI</p>
-              </div>
+            <div className="flex h-full items-center justify-center gap-2">
+              <Bot className="stroke-muted-foreground" />
+              <p className="text-muted-foreground">Ask AI</p>
             </div>
           )}
         </div>
         <form
           onSubmit={handleSubmit}
-          className="m-3 flex gap-1.5"
+          className="m-3 flex-1 gap-1.5"
         >
-          <Button
+          {/* <Button
             title="Clear chat"
-            variant="outline"
+            variant="secondary"
             size="icon"
             className="shrink-0"
             type="button"
             onClick={() => setMessages([])}
           >
             <Trash size={16} />
-          </Button>
-          <Input
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Type something..."
-            ref={inputRef}
-            className="flex-1"
-          />
-          <Button
-            type="submit"
-            size="icon"
-          >
-            <SendHorizontal size={16} />
-          </Button>
+          </Button> */}
+          <div className="relative flex items-center w-full rounded-2xl focus-within:focus-within-shadow">
+            <Input
+              value={input}
+              onChange={handleInputChange}
+              placeholder="Type something..."
+              ref={inputRef}
+              className="text-customTextWhite flex-1 p-2 rounded-2xl outline-none focus:outline-none focus:border-transparent"
+            />
+            <button
+              className="absolute right-3 opacity-40"
+              type="submit"
+            >
+              <CircleArrowUp size={18} />
+            </button>
+          </div>
         </form>
       </div>
     </div>
