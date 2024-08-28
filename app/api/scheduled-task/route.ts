@@ -11,19 +11,21 @@ import { db } from '@/firebase';
 import { fetchForecastData } from '@/app/fetch';
 import { Hash } from 'lucide-react';
 import { NextResponse } from 'next/server';
+import { EmailNotification, EmailTemplateProps } from '@/components/emailTemplates/email-templates';
+import { text } from 'stream/consumers';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST() {
   const processedCities = new Map<string, any>(); // Map to store processed cities and their forecast data
-  const dataToNotify = new Map<any, string[]>(); // Map to store data to be notified and the users that it needs to be sent to
+  const dataToNotify = new Map<string[], EmailTemplateProps>(); // Map to store data to be notified and the users that it needs to be sent to
 
   try {
     // Fetch all alert settings
     const alertSettingsRef = query(collectionGroup(db, 'alertSettings'));
     const querySnapshot = await getDocs(alertSettingsRef);
 
-    console.log('All alert settings:', querySnapshot.docs);
+    // console.log('All alert settings:', querySnapshot.docs);
 
     // Iterate over each user
     for (const alertSettings of querySnapshot.docs) {
@@ -45,12 +47,8 @@ export async function POST() {
 
         // Add user to the list of users that need to be notified
         if (notifications.length > 0) {
-          for (const notification of notifications) {
-            if (!dataToNotify.has(notification)) {
-              dataToNotify.set(notification, []);
-            }
-            dataToNotify.get(notification)!.push(data.emails);
-          }
+          const emailProps = { data: notifications };
+          dataToNotify.set(data.emails, emailProps);
         }
       } else {
         // Use cached forecast data
@@ -59,14 +57,10 @@ export async function POST() {
         // Check if the user needs to be notified
         const notifications = checkNotification(data, forecastData);
 
-        // Add user to the list of users that need to be notified
+        // Add all notifications to the Map
         if (notifications.length > 0) {
-          for (const notification of notifications) {
-            if (!dataToNotify.has(notification)) {
-              dataToNotify.set(notification, []);
-            }
-            dataToNotify.get(notification)!.push(data.emails);
-          }
+          const emailProps = { data: notifications };
+          dataToNotify.set(data.emails, emailProps);
         }
       }
     }
@@ -78,18 +72,22 @@ export async function POST() {
     );
   }
 
+  console.log('Data to notify:', dataToNotify);
+
+  
+
   // Send notifications to users
 
   // EMAIL
   const entries = Array.from(dataToNotify.entries());
   try {
 
-    for (const [notification, emails] of entries) {
+    for (const [emails, notifications] of entries) {
       const { data, error } = await resend.emails.send({
         from: 'WeatherHub <onboarding@resend.dev>',
         to: 's3977773@rmit.edu.vn',
         subject: 'WeatherHub Alert!',
-        react: EmailTemplate(notification),
+        react: EmailTemplate(notifications),
       });
 
       if (error) {
@@ -116,33 +114,37 @@ export async function POST() {
   myHeaders.append('Content-Type', 'application/json');
   myHeaders.append('Accept', 'application/json');
 
-  let textData = '';
-
-  for (const [notification, emails] of entries) {
-    // Introduction
-    textData += `WeatherHub weather alert!\n\n`;
-
-    // Capitalize the first letter of the notification type
-    notification.type = notification.type.charAt(0).toUpperCase() + notification.type.slice(1);
-
-    textData += `${notification.type} value is ${notification.value} at ${notification.date}\n`;
-  }
-
-  const raw = JSON.stringify({
+  const raw = {
     messages: [
       {
         destinations: [{ to: '84913237666' }],
         from: '447491163443',
-        text: textData,
+        text: '',
       },
     ],
-  });
+  };
 
   const requestOptions = {
     method: 'POST',
     headers: myHeaders,
-    body: raw,
+    body: JSON.stringify(raw),
   };
+  
+  for (const [emails, notifications] of entries) {
+      let textData = '';
+
+      for (const notification of notifications.data) {
+        // Intro
+        textData += `WeatherHub Alert!\n\n`;
+
+        // Capitalize the first letter of the notification type
+        const type = notification.type.charAt(0).toUpperCase() + notification.type.slice(1);
+        textData += `At ${notification.date.toISOString()}, ${type} is ${notification.value}\n`;
+      }
+
+      raw.messages[0].text = textData;
+
+  }
 
   const response = await fetch(INFOBIP_API_URL, requestOptions);
   const responseData = await response.json();
@@ -158,13 +160,13 @@ export async function POST() {
 }
 
 // Function to check if the user needs to be notified and when to notify what data
-function checkNotification(data: any, forecastData: any) {
+function checkNotification(data: any, forecastData: any): EmailNotification[] {
   // forecastData.list is an array of forecast data for the next 5 days with 3-hour intervals
   // Check every forecast for tomorrow from 6 AM to 3 PM ()
   // If any forecast meets the criteria, return true along with the data that needs to be notified
   // If no forecast meets the criteria, return false
 
-  const notifications = [];
+  const notifications: EmailNotification[] = [];
   const timeZoneDiff = forecastData.city.timezone; // Timezone difference in seconds
   for (let i = 5; i < 10; i++) {
     const forecast = forecastData.list[i];
@@ -179,10 +181,8 @@ function checkNotification(data: any, forecastData: any) {
     const rainVolume = forecast.rain?.['3h'] ? forecast.rain['3h'] : 0; // Rain volume in the last 3 hours if available
 
     // Check if the forecast meets the criteria
-    if (
-      temperature < data.temperatures.range[0] ||
-      temperature > data.temperatures.range[1]
-    ) {
+    if (temperature < data.temperatures.range[0] || temperature > data.temperatures.range[1]) {
+      // Create a EmailNotification object and add it to the notifications array
       notifications.push({ type: 'temperature', value: temperature, date });
     }
     if (
@@ -212,11 +212,7 @@ function checkNotification(data: any, forecastData: any) {
     }
 
     if (rainVolume > data.rainVolume.range[1]) {
-      notifications.push({
-        type: 'rainVolume',
-        value: forecast.rain['3h'],
-        date,
-      });
+      notifications.push({ type: 'rainVolume', value: rainVolume, date });
     }
   }
 
