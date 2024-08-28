@@ -11,7 +11,10 @@ import { db } from '@/firebase';
 import { fetchForecastData } from '@/app/fetch';
 import { Hash } from 'lucide-react';
 import { NextResponse } from 'next/server';
-import { EmailNotification, EmailTemplateProps } from '@/components/emailTemplates/email-templates';
+import {
+  EmailNotification,
+  EmailTemplateProps,
+} from '@/components/emailTemplates/email-templates';
 import { text } from 'stream/consumers';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -74,14 +77,11 @@ export async function POST() {
 
   console.log('Data to notify:', dataToNotify);
 
-  
-
   // Send notifications to users
 
   // EMAIL
   const entries = Array.from(dataToNotify.entries());
   try {
-
     for (const [emails, notifications] of entries) {
       const { data, error } = await resend.emails.send({
         from: 'WeatherHub <onboarding@resend.dev>',
@@ -124,33 +124,36 @@ export async function POST() {
     ],
   };
 
-  const requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: JSON.stringify(raw),
-  };
-  
   for (const [emails, notifications] of entries) {
-      let textData = '';
+    let textData = '';
+    textData += `WeatherHub Alert!\n\n`;
 
-      for (const notification of notifications.data) {
-        // Intro
-        textData += `WeatherHub Alert!\n\n`;
+    for (const notification of notifications.data) {
+      // Intro
 
-        // Capitalize the first letter of the notification type
-        const type = notification.type.charAt(0).toUpperCase() + notification.type.slice(1);
-        textData += `At ${notification.date.toISOString()}, ${type} is ${notification.value}\n`;
-      }
+      // Capitalize the first letter of the notification type
+      const type =
+        notification.type.charAt(0).toUpperCase() + notification.type.slice(1);
+      textData += `At ${notification.date.toISOString()}, ${type} is ${notification.value}\n`;
+    }
 
-      raw.messages[0].text = textData;
+    raw.messages[0].text = textData;
 
-  }
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: JSON.stringify(raw),
+    };
 
-  const response = await fetch(INFOBIP_API_URL, requestOptions);
-  const responseData = await response.json();
-  if (response.status !== 200) {
-    console.error('Failed to send SMS:', responseData);
-    return NextResponse.json({ error: 'Failed to send SMS' }, { status: 500 });
+    const response = await fetch(INFOBIP_API_URL, requestOptions);
+    const responseData = await response.json();
+    if (response.status !== 200) {
+      console.error('Failed to send SMS:', responseData);
+      return NextResponse.json(
+        { error: 'Failed to send SMS' },
+        { status: 500 }
+      );
+    }
   }
 
   return NextResponse.json(
@@ -181,7 +184,10 @@ function checkNotification(data: any, forecastData: any): EmailNotification[] {
     const rainVolume = forecast.rain?.['3h'] ? forecast.rain['3h'] : 0; // Rain volume in the last 3 hours if available
 
     // Check if the forecast meets the criteria
-    if (temperature < data.temperatures.range[0] || temperature > data.temperatures.range[1]) {
+    if (
+      temperature < data.temperatures.range[0] ||
+      temperature > data.temperatures.range[1]
+    ) {
       // Create a EmailNotification object and add it to the notifications array
       notifications.push({ type: 'temperature', value: temperature, date });
     }
