@@ -6,9 +6,10 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Button } from '@/components/ui/button';
 import { useState, useCallback } from 'react';
-import { WeatherInfo } from '@/type/weatherInfo';
+import { WeatherInfo, WeatherInfoType } from '@/type/weatherInfo';
 import Forecast from './Forecast';
 import './dashboard.css';
+import { Typography } from '@/components/Typography';
 
 // Function to shorten weather info types
 const getDisplayName = (type: string) => {
@@ -28,7 +29,7 @@ export default function Home() {
     setIsEditMode((prev) => !prev);
   };
 
-  const updateAvailableOptions = useCallback((newOptions: WeatherInfo[]) => {
+  const updateAvailableOptions = useCallback((newOptions: WeatherInfoType[]) => {
     setAvailableOptions(newOptions);
   }, []);
 
@@ -38,11 +39,11 @@ export default function Home() {
   }, []);
 
   const handleWidgetRemove = useCallback((option: string) => {
-    setAvailableOptions((prev) => {
-      const optionExists = prev.some((opt) => opt.type === option);
-      return optionExists ? prev : [...prev, { type: option }];
-    });
-    setWidgetList((prev) => prev.filter((widget) => widget !== option));
+    setAvailableOptions((prev) => [
+      ...prev,
+      WeatherInfo.find((info) => info.type === option)!,
+    ]);
+    setWidgetList((prev) => prev.filter((opt) => opt !== option));
   }, []);
 
   return (
@@ -50,17 +51,14 @@ export default function Home() {
       <Forecast />
 
       <div className="flex flex-col h-screen mt-5">
-        <div className="flex items-center justify-between p-2 border-b border-gray-300 mb-2">
-          <h1 className="m-0 text-xl font-medium">Dashboard</h1>
+        <div className="flex items-center justify-between p-2 mb-2">
+          <Typography variant="h2">Dashboard</Typography>
 
           <Button
-            variant="default"
+            variant={isEditMode ? 'secondary' : 'default'}
             onClick={handleToggleEditMode}
-            className={`${
-              isEditMode ? 'bg-red-500' : 'bg-blue-500'
-            } px-4 py-2 cursor-pointer`}
           >
-            {isEditMode ? 'Finish Editing' : 'Edit Layout'}
+            {isEditMode ? 'Save Layout' : 'Edit Layout'}
           </Button>
         </div>
 
@@ -76,8 +74,8 @@ export default function Home() {
           </div>
 
           {/* Draggable Options Column */}
-          <div className="w-48">
-            <h2 className="text-lg mb-2 font-bold">Chart List</h2>
+          <div className="w-48 space-y-2">
+            <Typography variant="h3">Chart List</Typography>
             {availableOptions.map((info) => (
               <DraggableOptions
                 key={info.type}
