@@ -58,16 +58,15 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
         open ? 'fixed' : 'hidden'
       )}
     >
-      <div></div>
       <Button
         onClick={onClose}
         variant="ghost"
         size="icon"
-        className="absolute right-3 top-3 bg-transparent text-muted-foreground hover:bg-transparent hover:text-muted-foreground"
+        className="absolute right-3 top-3 rounded-full hover:rounded-full hover:bg-foreground"
       >
         <X
           size={18}
-          className="stroke-muted-foreground"
+          className="stroke-muted"
         />
       </Button>
 
@@ -76,7 +75,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
           className="mt-3 h-full overflow-y-auto px-4"
           ref={scrollRef}
         >
-          {messages.map((message) => (
+          {messages.map((message: any) => (
             <ChatMessage
               message={message}
               key={message.id}
@@ -100,8 +99,8 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
           )}
           {!error && messages.length === 0 && (
             <div className="flex h-full items-center justify-center gap-2">
-              <Bot className="stroke-muted-foreground" />
-              <p className="text-muted-foreground">Ask AI</p>
+              <Bot className="stroke-muted" />
+              <p className='text-muted'>Ask AI</p>
             </div>
           )}
         </div>
@@ -109,26 +108,17 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
           onSubmit={handleSubmit}
           className="m-3 flex-1 gap-1.5"
         >
-          {/* <Button
-            title="Clear chat"
-            variant="secondary"
-            size="icon"
-            className="shrink-0"
-            type="button"
-            onClick={() => setMessages([])}
-          >
-            <Trash size={16} />
-          </Button> */}
-          <div className="relative flex items-center w-full rounded-2xl focus-within:focus-within-shadow">
+
+          <div className="relative flex items-center w-full rounded-2xl">
             <Input
               value={input}
               onChange={handleInputChange}
               placeholder="Type something..."
               ref={inputRef}
-              className="text-customTextWhite flex-1 p-2 rounded-2xl outline-none focus:outline-none focus:border-transparent"
+              className="flex-1 p-2 rounded-2xl"
             />
             <button
-              className="absolute right-3 opacity-40"
+              className="absolute right-3 text-muted"
               type="submit"
             >
               <CircleArrowUp size={18} />
