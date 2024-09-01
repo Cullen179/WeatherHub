@@ -18,7 +18,6 @@ export default function Forecast() {
 
   const handleCoordinatesFound = (latitude: number, longitude: number) => {
     setGeoLocation({ latitude, longitude });
-    console.log("Coordinates found:", { latitude, longitude });
   };
 
   const calculateDailyAverages = (forecastData: any[]) => {
