@@ -177,7 +177,11 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                       <FormControl>
                         <Button
                           type="reset"
-                          onClick={() => resetField(name + 'Range')}
+                          onClick={() =>
+                            resetField(
+                              `${name}Range` as keyof z.infer<typeof formSchema>
+                            )
+                          }
                         >
                           Default
                         </Button>
