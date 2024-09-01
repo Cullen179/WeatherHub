@@ -10,9 +10,16 @@ import {
 } from '@/components/ui/card';
 import { useWeather } from '@/hooks/WeatherContext';
 import ConditionLevel from '@/components/ConditionLevel';
+import SearchCity from './map/SearchCity';
+import { useEffect } from 'react';
 
 export default function Forecast() {
-  const { weatherData, forecastData } = useWeather();
+  const { weatherData, forecastData,geoLocation, setGeoLocation } = useWeather();
+
+  const handleCoordinatesFound = (latitude: number, longitude: number) => {
+    setGeoLocation({ latitude, longitude });
+    console.log("Coordinates found:", { latitude, longitude });
+  };
 
   const calculateDailyAverages = (forecastData: any[]) => {
     const dailyData: { [key: string]: any[] } = {};
@@ -52,7 +59,12 @@ export default function Forecast() {
         <h1>Error fetching data</h1>
       ) : (
         <>
-          <h1 className="text-3xl font-bold mb-3">{weatherData.name}</h1>
+          <div className='flex justify-between'>
+            <h1 className="text-3xl font-bold mb-3">{weatherData.name}</h1>
+            <div className="flex items-center p-4">
+              <SearchCity onCoordinatesFound={handleCoordinatesFound} />
+            </div>
+          </div>
           <h2 className="text-2xl font-bold mb-3">Week Forecast</h2>
           <div className="flex gap-2">
             <Card className="flex items-center basis-2/6 drop-shadow-md rounded-md">
