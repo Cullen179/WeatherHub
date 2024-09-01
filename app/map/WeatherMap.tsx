@@ -17,10 +17,32 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
+const WeatherInfor = [
+  {
+    "id": "temp_new",
+    "title": "Temperature",
+  },
+  {
+    "id": "clouds_new",
+    "title": "Clouds",
+  },
+  {
+    "id": "precipitation_new",
+    "title": "Precipitation",
+  },
+  {
+    "id": "pressure_new",
+    "title": "Pressure",
+  },
+  {
+    "id": "wind_new",
+    "title": "Wind",
+  },
+]
+
 const WeatherMap = () => {
   const [selectedLayer, setSelectedLayer] = useState<string>("temp_new");
   const [weatherLayerUrl, setWeatherLayerUrl] = useState<string | null>(null);
-
   const [cityCoordinates, setCityCoordinates] = useState<{ lat: number; lon: number } | null>(null);
 
   const handleCoordinatesFound = (lat: number, lon: number) => {
@@ -42,97 +64,52 @@ const WeatherMap = () => {
   if (!weatherLayerUrl) {
     return <div>Loading...</div>;
   }
-
-  
-
+ 
   return (
     <div className="flex flex-col h-svh">
       {/* Tabs for selecting map layers */}
-      <Tabs
-        value={selectedLayer}
-        onValueChange={(value) => setSelectedLayer(value)}
-        className="p-4 bg-gray-100"
-      >
-        <TabsList className="flex space-x-1 rounded-md bg-white p-1">
-          <TabsTrigger
-            value="temp_new"
-            className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium",
-              selectedLayer === "temp_new"
-                ? "bg-blue-500 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            )}
-          >
-            Temperature
-          </TabsTrigger>
-          <TabsTrigger
-            value="clouds_new"
-            className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium",
-              selectedLayer === "clouds_new"
-                ? "bg-blue-500 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            )}
-          >
-            Clouds
-          </TabsTrigger>
-          <TabsTrigger
-            value="precipitation_new"
-            className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium",
-              selectedLayer === "precipitation_new"
-                ? "bg-blue-500 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            )}
-          >
-            Precipitation
-          </TabsTrigger>
-          <TabsTrigger
-            value="pressure_new"
-            className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium",
-              selectedLayer === "pressure_new"
-                ? "bg-blue-500 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            )}
-          >
-            Pressure
-          </TabsTrigger>
-          <TabsTrigger
-            value="wind_new"
-            className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium",
-              selectedLayer === "wind_new"
-                ? "bg-blue-500 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            )}
-          >
-            Wind
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
-      <div>
-        <SearchCity onCoordinatesFound={handleCoordinatesFound} />
-        {cityCoordinates && (
-          <div className="mt-4">
-            <h3 className="text-lg font-medium">Exported Coordinates:</h3>
-            <p>Latitude: {cityCoordinates.lat}</p>
-            <p>Longitude: {cityCoordinates.lon}</p>
-          </div>
-        )}
+      <div className="absolute right-[5%] z-10 flex justify-between">
+        <Tabs
+          defaultValue={selectedLayer}
+          onValueChange={(value) => {
+            setSelectedLayer(value)
+          }}
+          className="p-4"
+        >
+          <TabsList className="flex space-x-1 rounded-md bg-white p-1">
+            {WeatherInfor.map((weather) => (
+              <TabsTrigger
+                key={weather.id}
+                value={weather.id}
+                className={cn(
+                  "px-3 rounded-md text-sm",
+                  weather.id === selectedLayer
+                    ? "bg-black text-white"
+                    : "text-gray-700 hover:bg-gray-200"
+                )}
+              >
+                {weather.title}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+        <div className="flex items-center p-4">
+          <SearchCity onCoordinatesFound={handleCoordinatesFound} />
+        </div>
       </div>
       {/* Map Container */}
       <MapContainer
+        key={cityCoordinates ? `${cityCoordinates.lat}-${cityCoordinates.lon}` : 'default'}
         center={cityCoordinates ? [cityCoordinates.lat, cityCoordinates.lon] : [10, 106]} 
-        zoom={9}
+        zoom={6}
         scrollWheelZoom={true}
-        className="flex-1"
+        className="relative h-[85%] z-0"
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <TileLayer
           attribution="&copy; OpenWeatherMap"
           url={weatherLayerUrl}
-          zIndex={10}
+          zIndex={1}
         />
         <Marker position={cityCoordinates ? [cityCoordinates.lat, cityCoordinates.lon] : [10, 106]}>
           <Popup>Your home</Popup>
