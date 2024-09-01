@@ -21,6 +21,7 @@ const SearchCity: React.FC<SearchCityProps> = ({ onCoordinatesFound }) => {
   const [city, setCity] = useState<string>("");
   const [coordinates, setCoordinates] = useState<CityCoordinates | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<CityCoordinates[]>([]);
 
   const handleSearch = async () => {
     if (!city) {
@@ -47,28 +48,73 @@ const SearchCity: React.FC<SearchCityProps> = ({ onCoordinatesFound }) => {
     }
   };
 
+  const fetchSuggestions = async (input: string) => {
+    if (!input) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+      const response = await axios.get(
+        `https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=5&appid=${apiKey}`
+      );
+      if (response.data && response.data.length > 0) {
+        const formattedSuggestions = response.data.map((city: any) => ({
+          name: city.name,
+          lat: city.lat,
+          lon: city.lon
+        }));
+        setSuggestions(formattedSuggestions);
+        setError(null);
+      } else {
+        setSuggestions([]);
+        setError("No cities found.");
+      }
+    } catch (err) {
+      setError("Failed to fetch data. Please try again.");
+    }
+  };
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCity(e.target.value);
+    fetchSuggestions(e.target.value);
+  };
+  
   return (
-    <div className="flex flex-col space-y-4">
-      <Input
-        type="text"
-        placeholder="Enter city name"
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        className="w-full p-2 border rounded-md"
-      />
-      <Button onClick={handleSearch} className="p-2 bg-blue-500 text-white rounded-md">
+    <div className="relative flex items-center gap-2">
+      <div className="relative">
+        <Input
+          type="text"
+          placeholder="Enter city name"
+          value={city}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded-md bg-white"
+        />
+        {suggestions.length > 0 && (
+          <ul className="absolute top-[100%] z-10 w-full mt-1 overflow-auto bg-white border rounded-md max-h-40">
+            {suggestions.map((suggestion, index) => (
+              <li
+                key={index}
+                className="p-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => {
+                  setCity(suggestion.name);
+                  setCoordinates(suggestion);
+                  setSuggestions([]);
+                  onCoordinatesFound(suggestion.lat, suggestion.lon);
+                }}
+              >
+                {suggestion.name}
+              </li>
+            ))}
+          </ul>
+        )}
+        {error && <div className="absolute top-[100%] z-10 p-3 w-full mt-1 overflow-auto bg-white border rounded-md max-h-40 text-red-500">
+          {error}
+        </div>}
+      </div>
+      <Button onClick={handleSearch}>
         Search
       </Button>
-
-      {error && <div className="text-red-500">{error}</div>}
-
-      {coordinates && (
-        <div className="mt-4">
-          <h3 className="text-lg font-medium">Coordinates for {coordinates.name}:</h3>
-          <p>Latitude: {coordinates.lat}</p>
-          <p>Longitude: {coordinates.lon}</p>
-        </div>
-      )}
     </div>
   );
 };
