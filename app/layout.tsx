@@ -5,7 +5,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { cn } from '@/lib/utils';
 import NavigationBar from '@/components/NavigationBar';
 import WeatherProvider from './WeatherProvider';
-import { fetchForecastData, fetchWeatherData, fetchWeatherMap } from './fetch';
+import { fetchForecastData, fetchWeatherData } from './fetch';
 
 const inter = Inter({ subsets: ['latin'] });
 
