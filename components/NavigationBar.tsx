@@ -17,7 +17,7 @@ export default function NavigationBar() {
         <Typography variant="h2">WeatherHub</Typography>
       </div>
       <div className="space-x-2 flex justify-between items-center">
-        {['dashboard', 'alert', 'trip-planning'].map((item) => (
+        {['dashboard', 'map', 'alert', 'trip-planning'].map((item) => (
           <Link
             key={item}
             href={'/' + item}
