@@ -46,9 +46,7 @@ const WeatherMap = () => {
   const [cityCoordinates, setCityCoordinates] = useState<{ lat: number; lon: number } | null>(null);
 
   const handleCoordinatesFound = (lat: number, lon: number) => {
-    setCityCoordinates({ lat, lon });
-    console.log("Coordinates found:", { lat, lon });
-    // You can now use lat and lon for other purposes here
+    setCityCoordinates({ lat, lon });    
   };
 
   useEffect(() => {
