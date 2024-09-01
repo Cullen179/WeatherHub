@@ -20,7 +20,6 @@ export default function WeatherProvider({
   // Function to fetch data
   const fetchData = async (latitude: number, longitude: number) => {
     try {
-      console.log('Fetching weather data for:', { latitude, longitude });
       const weatherData = await fetchWeatherData(latitude, longitude);
       const forecastData = await fetchForecastData(latitude, longitude);
       setWeatherData(weatherData);
@@ -35,12 +34,9 @@ export default function WeatherProvider({
       const { latitude, longitude } = geoLocation;
       fetchData(latitude, longitude);
     } else if (typeof window !== 'undefined' && 'geolocation' in navigator) {
-      console.log('GeoLocation is null, requesting user location...');
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          console.log('Setting GeoLocation:', { latitude, longitude });
-
           setGeoLocation({ latitude, longitude });
         },
         (error) => {
