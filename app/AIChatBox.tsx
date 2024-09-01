@@ -115,7 +115,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
               onChange={handleInputChange}
               placeholder="Type something..."
               ref={inputRef}
-              className="flex-1 p-2 rounded-2xl"
+              className="flex-1 p-4 pr-10 rounded-2xl placeholder:text-muted text-muted"
             />
             <button
               className="absolute right-3 text-muted"
