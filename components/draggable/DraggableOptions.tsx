@@ -1,6 +1,6 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useRef } from 'react';
 import { useDrag } from 'react-dnd';
 import { Button } from '@/components/ui/button';
 
@@ -13,6 +13,7 @@ const DraggableOptions: FC<DraggableOptionsProps> = ({
   option,
   displayName,
 }) => {
+  const ref = useRef<HTMLButtonElement>(null);
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'widget',
     item: { option },
@@ -21,10 +22,12 @@ const DraggableOptions: FC<DraggableOptionsProps> = ({
     }),
   }));
 
+  drag(ref);
+
   return (
     <Button
       variant="outline"
-      ref={drag}
+      ref={ref}
       className={`mb-2 w-full justify-start pl-2 ${
         isDragging ? 'opacity-50 cursor-grabbing' : 'opacity-100 cursor-grab'
       }`}
