@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Send POST request
-      run: |
-        curl -X POST https://weather-hub-five.vercel.app/api/scheduled-task \
-        -H "Content-Type: application/json"
+      - name: Send POST request
+        run: |
+          curl -X POST https://weather-hub-five.vercel.app/api/scheduled-task \
+          -H "Content-Type: application/json"

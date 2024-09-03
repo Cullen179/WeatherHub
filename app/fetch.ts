@@ -21,7 +21,11 @@ export async function fetchWeatherData(lat: number, lon: number) {
   return response;
 }
 
-export async function fetchForecastData(lat?: number, lon?: number, city?: string) {
+export async function fetchForecastData(
+  lat?: number,
+  lon?: number,
+  city?: string
+) {
   const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
 
   if (!apiKey) {
@@ -30,9 +34,9 @@ export async function fetchForecastData(lat?: number, lon?: number, city?: strin
 
   const baseUrl = `http://api.openweathermap.org/data/2.5/forecast`;
   let url;
-  
+
   if (city !== undefined) {
-    url = `${baseUrl}?q=${city}&appid=${apiKey}&units=metric`;  
+    url = `${baseUrl}?q=${city}&appid=${apiKey}&units=metric`;
   } else if (lat !== undefined && lon !== undefined) {
     url = `${baseUrl}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
   } else {

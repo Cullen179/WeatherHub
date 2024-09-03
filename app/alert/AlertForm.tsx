@@ -46,7 +46,7 @@ const formSchema = z.object({
 
   visibilityNoti: z.boolean().default(false).optional(),
   visibilityRange: z.array(z.number()).length(2), // km (1 - 20)
-                  
+
   windSpeedNoti: z.boolean().default(false).optional(),
   windSpeedRange: z.array(z.number()).length(2), // m/s (0 - 20)
 
@@ -73,7 +73,7 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
       temperatureRange: [0, 40],
 
       humidityNoti: false,
-      humidityRange: [30, 70], 
+      humidityRange: [30, 70],
 
       seaPressureNoti: false,
       seaPressureRange: [980, 1050],
@@ -114,9 +114,11 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       // Fetch geolocation
-      const { coords } = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
+      const { coords } = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        }
+      );
 
       // Include city in form data
       console.log(coords);
@@ -138,13 +140,55 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
   const [previousValue, setPreviousValue] = useState(false);
 
   const conditions = [
-    { name: 'temperature', label: 'Temperature (°C)', icon: <Thermometer />, min: -10, max: 50 },
-    { name: 'humidity', label: 'Humidity (%)', icon: <Droplet />, min: 0, max: 100 },
-    { name: 'seaPressure', label: 'Sea Pressure (hPa)', icon: <Waves />, min: 900, max: 1100 },
-    { name: 'visibility', label: 'Visibility (km)', icon: <Eye />, min: 0, max: 10 },
-    { name: 'windSpeed', label: 'Wind Speed (m/s)', icon: <Wind />, min: 0, max: 40 },
-    { name: 'rainChance', label: 'Rain Chance (%)', icon: <Umbrella />, min: 0, max: 100 },
-    { name: 'rainVolume', label: 'Rain Volume (mm/h)', icon: <Droplets />, min: 0, max: 50 },
+    {
+      name: 'temperature',
+      label: 'Temperature (°C)',
+      icon: <Thermometer />,
+      min: -10,
+      max: 50,
+    },
+    {
+      name: 'humidity',
+      label: 'Humidity (%)',
+      icon: <Droplet />,
+      min: 0,
+      max: 100,
+    },
+    {
+      name: 'seaPressure',
+      label: 'Sea Pressure (hPa)',
+      icon: <Waves />,
+      min: 900,
+      max: 1100,
+    },
+    {
+      name: 'visibility',
+      label: 'Visibility (km)',
+      icon: <Eye />,
+      min: 0,
+      max: 10,
+    },
+    {
+      name: 'windSpeed',
+      label: 'Wind Speed (m/s)',
+      icon: <Wind />,
+      min: 0,
+      max: 40,
+    },
+    {
+      name: 'rainChance',
+      label: 'Rain Chance (%)',
+      icon: <Umbrella />,
+      min: 0,
+      max: 100,
+    },
+    {
+      name: 'rainVolume',
+      label: 'Rain Volume (mm/h)',
+      icon: <Droplets />,
+      min: 0,
+      max: 50,
+    },
   ];
 
   return (
