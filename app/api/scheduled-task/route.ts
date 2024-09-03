@@ -9,13 +9,11 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { fetchForecastData } from '@/app/fetch';
-import { Hash } from 'lucide-react';
 import { NextResponse } from 'next/server';
 import {
   EmailNotification,
   EmailTemplateProps,
 } from '@/components/emailTemplates/email-templates';
-import { text } from 'stream/consumers';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -82,13 +80,28 @@ export async function POST() {
   // EMAIL
   const entries = Array.from(dataToNotify.entries());
   try {
+    // keep track of emails that have been sent
+    const sentEmails = new Set<string>();
+
+    // hard code to send to my email only
+
+    const email: string = 's3977773@rmit.edu.vn';
+
     for (const [emails, notifications] of entries) {
+      // check if the email has been sent
+      if (sentEmails.has(email)) {
+        console.log('Email already sent:', email);
+        continue;
+      }
+
       const { data, error } = await resend.emails.send({
         from: 'WeatherHub <onboarding@resend.dev>',
-        to: 's3977773@rmit.edu.vn',
+        to: email,
         subject: 'WeatherHub Alert!',
         react: EmailTemplate(notifications),
       });
+
+      sentEmails.add(email);
 
       if (error) {
         console.error('Failed to send email:', error);
@@ -117,12 +130,15 @@ export async function POST() {
   const raw = {
     messages: [
       {
-        destinations: [{ to: '84913237666' }],
+        destinations: [{ to: '84913237666' }, { to: '84942150366' }],
         from: '447491163443',
         text: '',
       },
     ],
   };
+
+  // Keep track of numbers that have been sent
+  const sentNumbers = new Set<string>();
 
   for (const [emails, notifications] of entries) {
     let textData = '';
