@@ -32,5 +32,5 @@ export async function GET() {
 
   
 
-  return Response.json(response);
+  // return Response.json(response);
 }
