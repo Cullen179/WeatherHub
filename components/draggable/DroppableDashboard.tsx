@@ -8,7 +8,7 @@ import 'react-resizable/css/styles.css';
 import WeatherWidget from './WeatherWidget';
 import { useWeather } from '@/hooks/WeatherContext';
 import { useUser } from '@clerk/nextjs';
-import { WeatherInfo } from '@/type/weatherInfo';
+import { WeatherInfo, WeatherInfoType } from '@/type/weatherInfo';
 import {
   Dialog,
   DialogContent,
@@ -19,12 +19,14 @@ import {
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { saveDashboardData } from '@/app/database/save';
 import { fetchAccountData } from '@/app/database/fetch';
+import { Button } from '../ui/button';
+import { X } from 'lucide-react';
 
 interface DroppableDashboardProps {
   isEditMode: boolean;
   onWidgetAdd: (option: string) => void;
   onWidgetRemove: (option: string) => void;
-  setAvailableOptions: (options: WeatherInfo[]) => void;
+  setAvailableOptions: (options: WeatherInfoType[]) => void;
 }
 
 const DroppableDashboard: FC<DroppableDashboardProps> = ({
@@ -114,7 +116,7 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({
         const accountData = await fetchAccountData(user.id);
         const fetchedWidgets = accountData.widgets || [];
         setWidgets(fetchedWidgets);
-        const usedOptions = fetchedWidgets.map((widget) => widget.option);
+        const usedOptions = fetchedWidgets.map((widget: any) => widget.option);
         setAvailableOptions(
           WeatherInfo.filter((info) => !usedOptions.includes(info.type))
         );
@@ -191,15 +193,10 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({
               <SkeletonCard />
             )}
             {isEditMode && (
-              <div
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={() => handleRemoveWidget(widget.i)}
-                className="absolute top-0 right-0 flex items-center justify-center"
-              >
-                <button className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
-                  x
-                </button>
-              </div>
+              <Button variant={'ghost'} onMouseDown={e => e.stopPropagation()} onClick={() => handleRemoveWidget(widget.i)}
+                className="absolute top-4 right-4">
+                  <X />
+              </Button>
             )}
           </div>
         ))}

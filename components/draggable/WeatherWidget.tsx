@@ -15,8 +15,6 @@ import {
 } from '@/components/ui/chart';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { WeatherInfo } from '@/type/weatherInfo';
-import { WeatherInfoType } from '@/type/weatherInfo';
-import { useWeather } from '@/hooks/WeatherContext';
 
 interface WeatherWidgetProps {
   option: string;
@@ -64,7 +62,7 @@ const WeatherWidget: FC<WeatherWidgetProps> = ({
 
   return (
     <div
-      className={`w-full ${isModal ? 'bg-white' : 'border border-gray-200 bg-white'}`}
+      className={`w-full`}
     >
       {!modalData ? (
         <SkeletonCard />
