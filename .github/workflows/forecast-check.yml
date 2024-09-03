@@ -1,0 +1,16 @@
+name: Scheduled POST Request
+
+on:
+  schedule:
+    # This cron syntax schedules the job to run at 12:00 AM UTC every day
+    - cron: '0 0 * * *'
+
+jobs:
+  send_post_request:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send POST request
+      run: |
+        curl -X POST https://weather-hub-five.vercel.app/api/scheduled-task \
+        -H "Content-Type: application/json"
