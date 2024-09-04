@@ -64,55 +64,57 @@ const WeatherMap = () => {
   }
  
   return (
-    <div className="flex flex-col h-svh">
-      {/* Tabs for selecting map layers */}
-      <div className="absolute right-[5%] z-10 flex justify-between">
-        <Tabs
-          defaultValue={selectedLayer}
-          onValueChange={(value) => {
-            setSelectedLayer(value)
-          }}
-          className="p-4"
-        >
-          <TabsList className="flex space-x-1 rounded-md bg-white p-1">
-            {WeatherInfor.map((weather) => (
-              <TabsTrigger
-                key={weather.id}
-                value={weather.id}
-                className={cn(
-                  "px-3 rounded-md text-sm",
-                  weather.id === selectedLayer
-                    ? "bg-black text-white"
-                    : "text-gray-700 hover:bg-gray-200"
-                )}
-              >
-                {weather.title}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-        <div className="flex items-center p-4">
-          <SearchCity onCoordinatesFound={handleCoordinatesFound} />
+    <div className="relative">
+      <div className="flex flex-col absolute -top-4 -left-10 w-screen h-[calc(100vh-53px)]">
+        {/* Tabs for selecting map layers */}
+        <div className="absolute right-2 z-10 flex justify-between">
+          <Tabs
+            defaultValue={selectedLayer}
+            onValueChange={(value) => {
+              setSelectedLayer(value)
+            }}
+            className="p-4"
+          >
+            <TabsList className="flex space-x-1 rounded-md bg-white p-1">
+              {WeatherInfor.map((weather) => (
+                <TabsTrigger
+                  key={weather.id}
+                  value={weather.id}
+                  className={cn(
+                    "px-3 rounded-md text-sm",
+                    weather.id === selectedLayer
+                      ? "bg-black text-white"
+                      : "text-gray-700 hover:bg-gray-200"
+                  )}
+                >
+                  {weather.title}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+          <div className="flex items-center">
+            <SearchCity onCoordinatesFound={handleCoordinatesFound} />
+          </div>
         </div>
+        {/* Map Container */}
+        <MapContainer
+          key={cityCoordinates ? `${cityCoordinates.lat}-${cityCoordinates.lon}` : 'default'}
+          center={cityCoordinates ? [cityCoordinates.lat, cityCoordinates.lon] : [10, 106]}
+          zoom={6}
+          scrollWheelZoom={true}
+          className="relative h-full z-0"
+        >
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <TileLayer
+            attribution="&copy; OpenWeatherMap"
+            url={weatherLayerUrl}
+            zIndex={1}
+          />
+          <Marker position={cityCoordinates ? [cityCoordinates.lat, cityCoordinates.lon] : [10, 106]}>
+            <Popup>Your home</Popup>
+          </Marker>
+        </MapContainer>
       </div>
-      {/* Map Container */}
-      <MapContainer
-        key={cityCoordinates ? `${cityCoordinates.lat}-${cityCoordinates.lon}` : 'default'}
-        center={cityCoordinates ? [cityCoordinates.lat, cityCoordinates.lon] : [10, 106]} 
-        zoom={6}
-        scrollWheelZoom={true}
-        className="relative h-[85%] z-0"
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <TileLayer
-          attribution="&copy; OpenWeatherMap"
-          url={weatherLayerUrl}
-          zIndex={1}
-        />
-        <Marker position={cityCoordinates ? [cityCoordinates.lat, cityCoordinates.lon] : [10, 106]}>
-          <Popup>Your home</Popup>
-        </Marker>
-      </MapContainer>
     </div>
   );
 };
