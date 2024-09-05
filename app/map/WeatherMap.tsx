@@ -110,7 +110,6 @@ const WeatherMap = () => {
           zIndex={1}
         />
         <Marker position={cityCoordinates ? [cityCoordinates.lat, cityCoordinates.lon] : [10, 106]}>
-          <Popup>Your home</Popup>
         </Marker>
       </MapContainer>
     </div>
