@@ -88,10 +88,10 @@ const SearchCity: React.FC<SearchCityProps> = ({ onCoordinatesFound }) => {
           placeholder="Enter city name"
           value={city}
           onChange={handleInputChange}
-          className="w-full p-2 border rounded-md bg-white"
+          className="w-full bg-background p-2 border rounded-md"
         />
         {suggestions.length > 0 && (
-          <ul className="absolute top-[100%] z-10 w-full mt-1 overflow-auto bg-white border rounded-md max-h-40">
+          <ul className="absolute top-[100%] z-10 w-full mt-1 bg-background overflow-auto border rounded-md max-h-40">
             {suggestions.map((suggestion, index) => (
               <li
                 key={index}
@@ -108,7 +108,7 @@ const SearchCity: React.FC<SearchCityProps> = ({ onCoordinatesFound }) => {
             ))}
           </ul>
         )}
-        {error && <div className="absolute top-[100%] z-10 p-3 w-full mt-1 overflow-auto bg-white border rounded-md max-h-40 text-red-500">
+        {error && <div className="absolute top-[100%] z-10 p-3 w-full mt-1 bg-background overflow-auto border rounded-md max-h-40 text-red-500">
           {error}
         </div>}
       </div>
