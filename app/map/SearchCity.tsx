@@ -95,7 +95,7 @@ const SearchCity: React.FC<SearchCityProps> = ({ onCoordinatesFound }) => {
             {suggestions.map((suggestion, index) => (
               <li
                 key={index}
-                className="p-2 hover:bg-gray-100 cursor-pointer"
+                className="p-2 hover:bg-gray-100 hover:text-black cursor-pointer"
                 onClick={() => {
                   setCity(suggestion.name);
                   setCoordinates(suggestion);
@@ -118,5 +118,6 @@ const SearchCity: React.FC<SearchCityProps> = ({ onCoordinatesFound }) => {
     </div>
   );
 };
+
 
 export default SearchCity;
