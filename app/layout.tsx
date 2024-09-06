@@ -24,7 +24,7 @@ export default async function RootLayout({
       <html lang="en">
         <body
           className={cn(
-            'min-h-screen bg-background font-sans antialiased px-10',
+            'min-h-screen dark bg-background font-sans antialiased px-10 flex flex-col',
             inter.className
           )}
         >
