@@ -40,7 +40,11 @@ const WeatherInfor = [
   },
 ]
 
-const WeatherMap = () => {
+const WeatherMap = ({
+  showSearch = true,
+}: {
+  showSearch?: boolean;
+}) => {
   const [selectedLayer, setSelectedLayer] = useState<string>("temp_new");
   const [weatherLayerUrl, setWeatherLayerUrl] = useState<string | null>(null);
   const [cityCoordinates, setCityCoordinates] = useState<{ lat: number; lon: number } | null>(null);
@@ -64,8 +68,7 @@ const WeatherMap = () => {
   }
  
   return (
-    <div className="relative">
-      <div className="flex flex-col absolute -top-4 -left-10 w-screen h-[calc(100vh-53px)]">
+    <>
         {/* Tabs for selecting map layers */}
         <div className="absolute right-2 z-10 flex justify-between">
           <Tabs
@@ -92,9 +95,11 @@ const WeatherMap = () => {
               ))}
             </TabsList>
           </Tabs>
-          <div className="flex items-center">
-            <SearchCity onCoordinatesFound={handleCoordinatesFound} />
-          </div>
+          {showSearch && (
+            <div className="flex items-center">
+              <SearchCity onCoordinatesFound={handleCoordinatesFound} />
+            </div> 
+          )}
         </div>
         {/* Map Container */}
         <MapContainer
@@ -111,11 +116,10 @@ const WeatherMap = () => {
             zIndex={1}
           />
           <Marker position={cityCoordinates ? [cityCoordinates.lat, cityCoordinates.lon] : [10, 106]}>
-            <Popup>Your home</Popup>
+            <Popup>Current Location</Popup>
           </Marker>
         </MapContainer>
-      </div>
-    </div>
+    </>
   );
 };
 
