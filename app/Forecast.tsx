@@ -119,8 +119,8 @@ export default function Forecast() {
                 </CardContent>
               </Card>
               <Card className='flex-col basis-1/2'>
-                <CardHeader>
-                  <p className='text-sm font-bold p-0'>5-day Forecast</p>
+                <CardHeader className='px-4'>
+                  <p className='text-sm font-bold'>5-day Forecast</p>
                 </CardHeader>
                 {calculateDailyAverages(forecastData.list).map(
                   (day: any, index: number) => (
@@ -158,7 +158,7 @@ export default function Forecast() {
                 )}
               </Card>
             </div>
-            <div className="w-[50%] h-[300px]">
+            <div className="w-[50%] h-[calc(15rem + 40px)]">
               <WeatherMap showSearch={false} showTabs={false} />
             </div>
           </div>
