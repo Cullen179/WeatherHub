@@ -87,14 +87,25 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({
   };
 
   const handleLayoutChange = (layout: any[]) => {
-    const updatedWidgets = layout.map((l) => ({
-      ...widgets.find((widget) => widget.i === l.i),
-      x: l.x,
-      y: l.y,
-      w: l.w,
-      h: l.h,
-    }));
-    setWidgets(updatedWidgets);
+    const updatedWidgets = layout
+      .map((l) => {
+        const foundWidget = widgets.find((widget) => widget.i === l.i);
+        if (!foundWidget) {
+          // Optionally handle the error or log it if a widget is not found
+          console.error(`No widget found with id: ${l.i}`);
+          return null; // or continue with some default object structure
+        }
+
+        return {
+          ...foundWidget,
+          x: l.x,
+          y: l.y,
+          w: l.w,
+          h: l.h,
+        };
+      })
+      .filter((widget) => widget !== null); 
+    setWidgets(prevWidgets => updatedWidgets);
     saveWidgetsToDatabase(updatedWidgets);
   };
 
