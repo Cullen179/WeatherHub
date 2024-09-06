@@ -7,9 +7,15 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware((auth, request) => {
-  if (!isPublicRoute(request)) {
-    auth().protect();
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  // Skip authentication checks in development mode
+  if (isPublicRoute(request)) {
+    return;
   }
+
+  // Protect routes if not in development mode
+  auth().protect();
 });
 
 export const config = {

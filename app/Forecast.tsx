@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card';
 import { useWeather } from '@/hooks/WeatherContext';
 import ConditionLevel from '@/components/ConditionLevel';
+import { SkeletonCard } from '@/components/SkeletonCard';
 
 export default function Forecast() {
   const { weatherData, forecastData } = useWeather();
@@ -49,7 +50,7 @@ export default function Forecast() {
   return (
     <div>
       {!weatherData ? (
-        <h1>Error fetching data</h1>
+        <SkeletonCard />
       ) : (
         <>
           <h1 className="text-3xl font-bold mb-3">{weatherData.name}</h1>

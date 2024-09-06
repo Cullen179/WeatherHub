@@ -16,14 +16,14 @@ export default function WeatherProvider({
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          console.log('Latitude:', latitude);
-          console.log('Longitude:', longitude);
 
           const weatherData = await fetchWeatherData(latitude, longitude);
           const forecastData = await fetchForecastData(latitude, longitude);
 
-          setWeatherData(weatherData);
-          setForecastData(forecastData);
+          await Promise.all([weatherData, forecastData]);
+
+          setWeatherData((w) => weatherData);
+          setForecastData((f) => forecastData);
         },
         (error) => {
           console.error('Error getting location:', error);
