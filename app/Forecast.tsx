@@ -10,9 +10,9 @@ import {
 } from '@/components/ui/card';
 import { useWeather } from '@/hooks/WeatherContext';
 import ConditionLevel from '@/components/ConditionLevel';
+import { SkeletonCard } from '@/components/SkeletonCard';
 import SearchCity from './map/SearchCity';
 import WeatherMap from './map/WeatherMap';
-import { useEffect } from 'react';
 
 export default function Forecast() {
   const { weatherData, forecastData, geoLocation, setGeoLocation } = useWeather();
@@ -58,7 +58,7 @@ export default function Forecast() {
   return (
     <div>
       {!weatherData ? (
-        <h1>Error fetching data</h1>
+        <SkeletonCard />
       ) : (
         <>
           <div className='flex justify-between'>

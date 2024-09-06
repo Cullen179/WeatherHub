@@ -35,9 +35,17 @@ export default function WeatherProvider({
       fetchData(latitude, longitude);
     } else if (typeof window !== 'undefined' && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
           setGeoLocation({ latitude, longitude });
+
+          const weatherData = await fetchWeatherData(latitude, longitude);
+          const forecastData = await fetchForecastData(latitude, longitude);
+
+          await Promise.all([weatherData, forecastData]);
+
+          setWeatherData((w) => weatherData);
+          setForecastData((f) => forecastData);
         },
         (error) => {
           console.error('Error getting location:', error);

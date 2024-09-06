@@ -9,8 +9,8 @@ export default function ConditionLevel({
   startNum: number;
   endNum: number;
 }) {
-  const info = WeatherInfo.info.find((info) => info.type === type);
-  console.log(info);
+  const info = WeatherInfo.find((info) => info.type === type);
+
   if (!info) {
     return null;
   }
