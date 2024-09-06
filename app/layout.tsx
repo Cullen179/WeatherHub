@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import NavigationBar from '@/components/NavigationBar';
 import WeatherProvider from './WeatherProvider';
 import { fetchForecastData, fetchWeatherData } from './fetch';
+import AIChatButton from '@/components/AI/AIChatBoxButton';
 
 const inter = Inter({ subsets: ['latin'] });
 

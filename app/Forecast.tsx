@@ -15,7 +15,8 @@ import SearchCity from './map/SearchCity';
 import WeatherMap from './map/WeatherMap';
 
 export default function Forecast() {
-  const { weatherData, forecastData, geoLocation, setGeoLocation } = useWeather();
+  const { weatherData, forecastData, geoLocation, setGeoLocation } =
+    useWeather();
 
   const handleCoordinatesFound = (latitude: number, longitude: number) => {
     setGeoLocation({ latitude, longitude });
@@ -61,41 +62,46 @@ export default function Forecast() {
         <SkeletonCard />
       ) : (
         <>
-          <div className='flex justify-between'>
+          <div className="flex justify-between">
             <h2 className="text-2xl font-bold mb-3">Week Forecast</h2>
             <div className="flex items-center justify-end mb-4">
               <SearchCity onCoordinatesFound={handleCoordinatesFound} />
             </div>
           </div>
-          <div className='flex gap-4'>
+          <div className="flex gap-4">
             <div className="flex w-[50%] gap-4">
               <Card className="basis-3/6 drop-shadow-md rounded-md">
                 <CardHeader>
                   <div className="flex justify-between items-center mb-2">
-                    <CardTitle className="basis-1/2 text-sm">{weatherData.name}</CardTitle>
-                    <CardDescription className='basis-1/2 flex justify-end'>
-                      {new Date(weatherData.dt * 1000).toLocaleTimeString('en-EN', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: true,
-                      })}
-                    </CardDescription>
+                    <CardTitle>{weatherData.name}</CardTitle>
                   </div>
-                    <div className='text-sm basis-1/3'>
-                      {"Today: "}
+                  <div className='flex space-x-2'>
+                    <p className="text-sm">
+                      {'Today: '}
                       {
                         new Date(weatherData.dt * 1000)
-                        .toLocaleDateString('en-GB', {
-                          weekday: 'long',
-                        })
-                        .split('T')[0]
+                          .toLocaleDateString('en-GB', {
+                            weekday: 'long',
+                          })
+                          .split('T')[0]
                       }
-                    </div>
+                    </p>
+                    <CardDescription>
+                      {new Date(weatherData.dt * 1000).toLocaleTimeString(
+                        'en-EN',
+                        {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: true,
+                        }
+                      )}
+                    </CardDescription>
+                  </div>
                 </CardHeader>
-                  <h2 className="flex justify-center text-6xl my-5 font-bold">
-                    {weatherData.main.temp.toFixed(0)}°
-                  </h2>
+                <h2 className="flex justify-center text-6xl my-5 font-bold">
+                  {weatherData.main.temp.toFixed(0)}°
+                </h2>
                 <CardContent className="basis-2/5">
                   <div className="flex flex-col">
                     <Image
@@ -109,34 +115,32 @@ export default function Forecast() {
                     </p>
                     <div className="flex">
                       <p className="text-sm text-muted-foreground">
-                        {"L: "}
-                        {weatherData.main.temp_min.toFixed(0)}°
-                        {" H: "}
+                        {'L: '}
+                        {weatherData.main.temp_min.toFixed(0)}°{' H: '}
                         {weatherData.main.temp_max.toFixed(0)}°
                       </p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className='flex-col basis-1/2'>
-                <CardHeader className='px-4'>
-                  <p className='text-sm font-bold'>5-day Forecast</p>
+              <Card className="flex-col basis-1/2">
+                <CardHeader className="px-4">
+                  <CardTitle>5-day Forecast</CardTitle>
                 </CardHeader>
                 {calculateDailyAverages(forecastData.list).map(
                   (day: any, index: number) => (
                     <Card
-                      className="flex items-center justify-between basis-1/5 border-0 border-b rounded-md py-2 px-4"
+                      className="flex items-center justify-between basis-1/5 border-0 border-b rounded-none border-border py-2 px-4"
                       key={index}
                     >
                       <h2 className="text-sm basis-1/4">
                         {index === 0
-                          ? "Today"
+                          ? 'Today'
                           : index === 1
-                          ? "Tomorrow"
-                          : new Date(day.date).toLocaleDateString('en-GB', {
-                              weekday: 'short',
-                          })
-                        }
+                            ? 'Tomorrow'
+                            : new Date(day.date).toLocaleDateString('en-GB', {
+                                weekday: 'short',
+                              })}
                       </h2>
                       <Image
                         src={`http://openweathermap.org/img/wn/${day.icon}@2x.png`}
@@ -147,7 +151,7 @@ export default function Forecast() {
                       <p className="text-sm">{day.minTemp}° </p>
                       <div className="basis-1/3">
                         <ConditionLevel
-                          type= "Temperature"
+                          type="Temperature"
                           startNum={day.minTemp}
                           endNum={day.maxTemp}
                         />
@@ -159,7 +163,10 @@ export default function Forecast() {
               </Card>
             </div>
             <div className="w-[50%] h-[calc(15rem + 40px)]">
-              <WeatherMap showSearch={false} showTabs={false} />
+              <WeatherMap
+                showSearch={false}
+                showTabs={false}
+              />
             </div>
           </div>
         </>

@@ -172,9 +172,7 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({
         drop(el);
         dashboardRef.current = el;
       }}
-      className={`relative min-h-[500px] bg-white p-2 border border-gray-300 overflow-auto max-h-screen ${
-        isOver ? 'bg-gray-100' : ''
-      }`}
+      className={`relative min-h-[500px] bg-background p-2 border border-border overflow-auto max-h-screen`}
     >
       <GridLayout
         className="layout"
@@ -189,7 +187,7 @@ const DroppableDashboard: FC<DroppableDashboardProps> = ({
         {widgets.map((widget) => (
           <div
             key={widget.i}
-            className={`relative bg-white ${
+            className={`relative bg-background ${
               isEditMode ? 'cursor-grab' : 'cursor-pointer'
             }`}
             onClick={() => handleWidgetClick(widget.option)}

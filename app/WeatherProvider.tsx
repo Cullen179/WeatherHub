@@ -2,6 +2,7 @@
 import { WeatherContext } from '@/hooks/WeatherContext';
 import { fetchForecastData, fetchWeatherData } from './fetch';
 import { useEffect, useState } from 'react';
+import AIChatButton from '@/components/AI/AIChatBoxButton';
 
 interface geoLocation {
   latitude: number;
@@ -55,8 +56,11 @@ export default function WeatherProvider({
   }, [geoLocation]);
 
   return (
-    <WeatherContext.Provider value={{ weatherData, forecastData, geoLocation, setGeoLocation }}>
+    <WeatherContext.Provider
+      value={{ weatherData, forecastData, geoLocation, setGeoLocation }}
+    >
       {children}
+      <AIChatButton />
     </WeatherContext.Provider>
   );
 }

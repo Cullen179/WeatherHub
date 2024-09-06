@@ -66,7 +66,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
       >
         <X
           size={18}
-          className="stroke-muted"
+          className="stroke-foreground"
         />
       </Button>
 
@@ -99,8 +99,8 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
           )}
           {!error && messages.length === 0 && (
             <div className="flex h-full items-center justify-center gap-2">
-              <Bot className="stroke-muted" />
-              <p className='text-muted'>Ask AI</p>
+              <Bot className="stroke-foreground" />
+              <p className='text-forestroke-foreground'>Ask AI</p>
             </div>
           )}
         </div>
@@ -115,10 +115,10 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
               onChange={handleInputChange}
               placeholder="Type something..."
               ref={inputRef}
-              className="flex-1 p-4 pr-10 rounded-2xl placeholder:text-muted text-muted"
+              className="flex-1 p-4 pr-10 rounded-2xl placeholder:text-forestroke-foreground text-forestroke-foreground"
             />
             <button
-              className="absolute right-3 text-muted"
+              className="absolute right-3 text-forestroke-foreground"
               type="submit"
             >
               <CircleArrowUp size={18} />

@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export default function NavigationBar() {
   return (
-    <div className="w-screen -mx-10 p-10 flex justify-between items-center py-2 border-b-[1px] mb-4">
+    <div className="w-screen -mx-10 p-10 flex justify-between items-center py-2 border-border border-b-[1px] mb-4">
       <div className=" flex justify-between items-center">
         <Image
           alt="icon"
