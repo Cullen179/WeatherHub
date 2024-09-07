@@ -75,7 +75,7 @@ export default function Forecast() {
                   <div className="flex justify-between items-center mb-2">
                     <CardTitle>{weatherData.name}</CardTitle>
                   </div>
-                  <div className='flex space-x-2'>
+                  <div className="flex space-x-2">
                     <p className="text-sm">
                       {'Today: '}
                       {
@@ -123,7 +123,7 @@ export default function Forecast() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="flex-col basis-1/2">
+              <Card className="flex-col basis-1/2 overflow-hidden">
                 <CardHeader className="px-4">
                   <CardTitle>5-day Forecast</CardTitle>
                 </CardHeader>
@@ -162,12 +162,12 @@ export default function Forecast() {
                 )}
               </Card>
             </div>
-            <div className="w-[50%] h-[calc(15rem + 40px)]">
+            <Card className="w-[50%] h-[calc(15rem + 40px)] overflow-hidden">
               <WeatherMap
                 showSearch={false}
                 showTabs={false}
               />
-            </div>
+            </Card>
           </div>
         </>
       )}
