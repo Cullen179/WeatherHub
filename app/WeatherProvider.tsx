@@ -31,29 +31,34 @@ export default function WeatherProvider({
   };
 
   useEffect(() => {
-    if (geoLocation) {
-      const { latitude, longitude } = geoLocation;
-      fetchData(latitude, longitude);
-    } else if (typeof window !== 'undefined' && 'geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          setGeoLocation({ latitude, longitude });
+    if (typeof window !== 'undefined') {
+      // Make sure the browser environment is available
 
-          const weatherData = await fetchWeatherData(latitude, longitude);
-          const forecastData = await fetchForecastData(latitude, longitude);
+      if (geoLocation) {
+        const { latitude, longitude } = geoLocation;
+        fetchData(latitude, longitude);
+      } else if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            setGeoLocation({ latitude, longitude });
 
-          await Promise.all([weatherData, forecastData]);
+            const weatherData = await fetchWeatherData(latitude, longitude);
+            const forecastData = await fetchForecastData(latitude, longitude);
 
-          setWeatherData((w) => weatherData);
-          setForecastData((f) => forecastData);
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-        }
-      );
+            await Promise.all([weatherData, forecastData]);
+
+            setWeatherData((w) => weatherData);
+            setForecastData((f) => forecastData);
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+          }
+        );
+      }
     }
   }, [geoLocation]);
+
 
   return (
     <WeatherContext.Provider
