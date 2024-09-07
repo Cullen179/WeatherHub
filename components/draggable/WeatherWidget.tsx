@@ -68,14 +68,14 @@ const WeatherWidget: FC<WeatherWidgetProps> = ({
         <SkeletonCard />
       ) : (
         <Card
-          className={`${isModal ? 'bg-white border-none shadow-none' : 'bg-white border border-gray-100 shadow-md'}`}
+          className={`${isModal ? 'bg-background border-none shadow-none' : 'bg-background border border-border shadow-md'}`}
         >
           <CardHeader className="mb-2">
-            <CardTitle className="text-lg font-semibold text-gray-900">
+            <CardTitle className="text-lg font-semibold">
               {`${weatherInfo.type} (${weatherInfo.unit})`}
             </CardTitle>
             {showDescription && (
-              <CardDescription className="text-sm text-gray-600">
+              <CardDescription className="text-sm">
                 {weatherInfo.definition}
               </CardDescription>
             )}
@@ -97,7 +97,7 @@ const WeatherWidget: FC<WeatherWidgetProps> = ({
                   axisLine={false}
                   tickMargin={8}
                   tickFormatter={(value: string) => value}
-                  className="text-gray-700"
+                  className="text-"
                 />
                 <ChartTooltip
                   cursor={false}

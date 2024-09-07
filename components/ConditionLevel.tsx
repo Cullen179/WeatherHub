@@ -20,8 +20,7 @@ export default function ConditionLevel({
   return (
     <div
       className={
-        `bg-gradient-to-r from-[${info.startColor}] from-${startPercent}% to-[${info.endColor}] to-${endPercent}%` +
-        ' w-full h-2 rounded'
+        `bg-gradient-to-r from-[#4ab7ff] from-${startPercent}% to-[#ff3232] to-${endPercent}% w-fill h-[6px] rounded`
       }
     />
   );

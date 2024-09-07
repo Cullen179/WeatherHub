@@ -12,7 +12,7 @@ const AIChatButton: FC<{}> = () => {
     <>
       <ActionIconButton
         className={cn(
-          'opacity-100 flex items-center justify-center w-12 h-12 shadow-lg rounded-full absolute bottom-4 right-4',
+          'opacity-100 flex items-center justify-center w-12 h-12 shadow-lg rounded-full fixed bottom-4 right-4',
           chatBoxOpen ? 'hidden' : ''
         )}
         onClick={() => setChatBoxOpen(true)}

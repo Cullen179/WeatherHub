@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export default function NavigationBar() {
   return (
-    <div className="w-screen -mx-10 p-10 flex justify-between items-center py-2 border-b-[1px] mb-4">
+    <div className="w-screen -mx-10 p-10 flex justify-between items-center py-2 border-border border-b-[1px] mb-4">
       <div className=" flex justify-between items-center">
         <Image
           alt="icon"
@@ -17,7 +17,7 @@ export default function NavigationBar() {
         <Typography variant="h2">WeatherHub</Typography>
       </div>
       <div className="space-x-2 flex justify-between items-center">
-        {['dashboard', 'alert', 'trip-planning'].map((item) => (
+        {['dashboard', 'map', 'alert', 'trip-planning'].map((item) => (
           <Link
             key={item}
             href={'/' + item}

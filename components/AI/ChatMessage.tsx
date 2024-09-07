@@ -19,10 +19,10 @@ export default function ChatMessage({
         isAiMessage ? 'me-5 justify-start' : 'ms-5 justify-end'
       )}
     >
-      {isAiMessage && <Bot className="mr-2 shrink-0 stroke-muted" />}
+      {isAiMessage && <Bot className="mr-2 shrink-0 stroke-foreground" />}
       <p
         className={cn(
-          'text-muted px-4 py-2',
+          'text-background px-4 py-2',
           !isAiMessage && 'rounded bg-foreground'
         )}
       >

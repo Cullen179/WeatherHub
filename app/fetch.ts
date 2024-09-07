@@ -40,3 +40,4 @@ export async function fetchForecastData(lat: number, lon: number) {
 
   return response;
 }
+

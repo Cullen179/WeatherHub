@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import NavigationBar from '@/components/NavigationBar';
 import WeatherProvider from './WeatherProvider';
 import { fetchForecastData, fetchWeatherData } from './fetch';
+import AIChatButton from '@/components/AI/AIChatBoxButton';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,7 +25,7 @@ export default async function RootLayout({
       <html lang="en">
         <body
           className={cn(
-            'min-h-screen bg-background font-sans antialiased px-10',
+            'min-h-screen dark bg-background font-sans antialiased px-10 flex flex-col',
             inter.className
           )}
         >

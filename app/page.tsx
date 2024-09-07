@@ -10,7 +10,6 @@ import { WeatherInfo, WeatherInfoType } from '@/type/weatherInfo';
 import Forecast from './Forecast';
 import './dashboard.css';
 import { Typography } from '@/components/Typography';
-import AIChatButton from '@/components/AI/AIChatBoxButton';
 
 // Function to shorten weather info types
 const getDisplayName = (type: string) => {
@@ -92,7 +91,6 @@ export default function Home() {
           </div>
         </div>
       </DndProvider>
-      <AIChatButton />
     </div>
   );
 }
