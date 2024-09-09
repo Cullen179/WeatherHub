@@ -1,25 +1,34 @@
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Weather from './weather';
+import Location from './location';
+import Date from './date';
+import { ReactNode } from 'react';
 
 export default function Sheet() {
     const tripParams = [
-        'weather',
-        'location',
-        'date'
-    ]
+        { param: 'weather', component: <Weather /> },
+        { param: 'location', component: <Location /> },
+        { param: 'date', component: <Date/> },
+    ] as { param: string; component: ReactNode }[];
   return (
     <Tabs
-      defaultValue="account"
+      defaultValue={tripParams[0].param}
       className="w-full"
     >
-      <TabsList className="grid w-full grid-cols-2">
-        
+      <TabsList className='w-full flex space-x-2'>
+
         {tripParams.map((param) => (
-          <TabsTrigger key={param} value={param} className="px-4 py-2">
-            {param.toUpperCase()}
+          <TabsTrigger className='w-full' key={param.param} value={param.param}>
+            {param.param.toUpperCase()}
             </TabsTrigger>
         ))}
           </TabsList>
-          
+
+          {tripParams.map((param) => (
+              <TabsContent key={param.param} value={param.param} >
+                  {param.component}
+              </TabsContent>
+            ))}
     </Tabs>
   );
 }
