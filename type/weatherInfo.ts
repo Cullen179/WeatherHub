@@ -76,6 +76,15 @@ export const WeatherInfo: WeatherInfoType[] = [
     subPath: '3h',
     chartColor: '220 70% 50%',
   },
+  {
+    type: 'Cloudiness',
+    definition:
+      'Cloudiness is the fraction of the sky covered by clouds when observed from a particular location.',
+    unit: '%',
+    variablePath: 'clouds',
+    subPath: 'all',
+    chartColor: '240 1% 58%',
+  }
 ];
 
 export const WeatherType = WeatherInfo.map((info) => info.type);
