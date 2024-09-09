@@ -12,9 +12,19 @@ import { useWeather } from '@/hooks/WeatherContext';
 import ConditionLevel from '@/components/ConditionLevel';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import SearchCity from './map/SearchCity';
-import WeatherMap from './map/WeatherMap';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+import { set } from 'zod';
+
+const WeatherMap = dynamic(() => import('./map/WeatherMap'), { ssr: false });
 
 export default function Forecast() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect (() => {
+    setMounted(true);
+  }, []);
+
   const { weatherData, forecastData, geoLocation, setGeoLocation } =
     useWeather();
 
@@ -55,6 +65,10 @@ export default function Forecast() {
 
     return dailyAverages;
   };
+
+  if (!mounted) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
