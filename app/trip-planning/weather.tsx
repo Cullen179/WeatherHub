@@ -19,6 +19,7 @@ import { fetchForecastData } from '../fetch';
 import { WeatherInfo } from '@/type/weatherInfo';
 import { useState } from 'react';
 import ActivityRecom from './form/ActivityRecom';
+import { count } from 'console';
 
 const FormSchema = z.object({
     activityDate: z.date({
@@ -39,7 +40,7 @@ export default function Weather() {
     const [weatherOverview, setWeatherOverview] = useState<any>({});
 
     const { setValue } = form;
-    
+
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         const activityDate = data.activityDate.toISOString().split('T')[0];
         let weatherData = await fetchForecastData(data.lat, data.lon);
@@ -49,50 +50,37 @@ export default function Weather() {
             return;
         }
 
-        const formatWeatherData = weatherData.list
-            .filter((item: any) => item.dt_txt.split(' ')[0] === activityDate)
-            .map((item: any) => {
-                return {
-                    ...WeatherInfo.reduce((acc: any, key) => {
-                        if (!item[key.variablePath]) {
-                            acc[
-                                key.variablePath +
-                                    (key.subPath ? key.subPath : '')
-                            ] = 0;
-                            return acc;
-                        }
+        const overview = weatherData.list.reduce((acc: any, item: any) => {
+            const date = item.dt_txt.split(' ')[0];
 
-                        acc[
-                            key.variablePath + (key.subPath ? key.subPath : '')
-                        ] = key.subPath
-                            ? item[key.variablePath][key.subPath]
-                            : item[key.variablePath];
-                        return acc;
-                    }, {}),
-                };
+            if (date !== activityDate) {
+                return acc;
+            }
+            WeatherInfo.forEach((key) => {
+                !acc[key.variablePath + (key.subPath ? key.subPath : '')] &&
+                    (acc[key.variablePath + (key.subPath ? key.subPath : '')] =
+                        0);
+
+                if (!item[key.variablePath]) {
+                    return;
+                }
+
+                acc[key.variablePath + (key.subPath ? key.subPath : '')] +=
+                    key.subPath
+                        ? item[key.variablePath][key.subPath]
+                        : item[key.variablePath];
             });
 
-        const overviewData = formatWeatherData.reduce((acc: any, item: any) => {
-            // Initialize acc with zero values if it's the first iteration
-            if (acc.activityDate === undefined) {
-                acc = { activityDate, ...item };
-            } else {
-                // Sum up the numeric values and increment count outside the loop
-                Object.keys(item).forEach((key) => {
-                    if (typeof item[key] == 'number') {
-                        acc[key] += item[key] || 0;
-                    }
-                });
-            }
-
+            acc.count+= 1;
             return acc;
-        }, {});
+        }, {count: 0, activityDate: activityDate});
 
-        Object.keys(overviewData).forEach((key: any) => {
-            typeof overviewData[key] === 'number' &&
-                (overviewData[key] /= formatWeatherData.length);
+        Object.keys(overview).forEach((key: any) => {
+            (key != 'count' && typeof overview[key] === 'number') &&
+            (overview[key] /= overview.count);
         });
-        setWeatherOverview(overviewData);
+
+        setWeatherOverview(overview);
     }
 
     return (
