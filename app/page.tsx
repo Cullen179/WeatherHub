@@ -43,12 +43,19 @@ export default function Home() {
   }, []);
 
   const handleWidgetRemove = useCallback((option: string) => {
-    setAvailableOptions((prev) => [
-      ...prev,
-      WeatherInfo.find((info) => info.type === option)!,
-    ]);
+    setAvailableOptions((prev) => {
+      const alreadyExists = prev.some((opt) => opt.type === option);
+      if (!alreadyExists) {
+        return [
+          ...prev,
+          WeatherInfo.find((info) => info.type === option)!,
+        ];
+      }
+      return prev;
+    });
     setWidgetList((prev) => prev.filter((opt) => opt !== option));
   }, []);
+  
 
   return (
     <div>
