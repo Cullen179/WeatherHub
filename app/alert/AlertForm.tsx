@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -16,38 +16,45 @@ import {
 import { z } from 'zod';
 import { Switch } from '@/components/ui/switch';
 
+import { Checkbox } from '@/components/ui/checkbox';
 import {
-  CloudLightning,
-  Flame,
   Thermometer,
-  Tornado,
+  Droplet,
+  Waves,
+  Eye,
   Wind,
-  Zap,
+  Droplets,
+  Umbrella,
 } from 'lucide-react';
 
 import { Toaster, toast } from 'sonner';
 
 import { InputTags } from '@/components/ui/emailTags';
 import { Slider } from '@/components/ui/slider';
+import { fetchUserAlerts, saveUserAlerts } from './action';
+import { fetchCity } from '../fetch';
 
 const formSchema = z.object({
   temperatureNoti: z.boolean().default(false).optional(),
-  temperatureRange: z.array(z.number()).length(2),
+  temperatureRange: z.array(z.number()).length(2), // Celsius (0 - 40)
 
-  sparkNoti: z.boolean().default(false).optional(),
-  sparkRange: z.array(z.number()).length(2),
+  humidityNoti: z.boolean().default(false).optional(),
+  humidityRange: z.array(z.number()).length(2), // Percentage (30 - 70)
 
-  hurricaneNoti: z.boolean().default(false).optional(),
-  hurricaneRange: z.array(z.number()).length(2),
+  seaPressureNoti: z.boolean().default(false).optional(),
+  seaPressureRange: z.array(z.number()).length(2), // hPa (980 - 1050)
 
-  fireNoti: z.boolean().default(false).optional(),
-  fireRange: z.array(z.number()).length(2),
+  visibilityNoti: z.boolean().default(false).optional(),
+  visibilityRange: z.array(z.number()).length(2), // km (1 - 20)
 
-  airQualityNoti: z.boolean().default(false).optional(),
-  airQualityRange: z.array(z.number()).length(2),
+  windSpeedNoti: z.boolean().default(false).optional(),
+  windSpeedRange: z.array(z.number()).length(2), // m/s (0 - 20)
 
-  stormRiskNoti: z.boolean().default(false).optional(),
-  stormRiskRange: z.array(z.number()).length(2),
+  rainChanceNoti: z.boolean().default(false).optional(),
+  rainChanceRange: z.array(z.number()).length(2), // % (0 - 50)
+
+  rainVolumeNoti: z.boolean().default(false).optional(),
+  rainVolumeRange: z.array(z.number()).length(2), // mm (0 - 50)
   email: z
     .array(z.string().email({ message: 'Invalid email address' }))
     .nonempty('At least one email is required'),
@@ -63,41 +70,125 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       temperatureNoti: false,
-      temperatureRange: [25, 50], // Default range with two numbers
+      temperatureRange: [0, 40],
 
-      sparkNoti: false,
-      sparkRange: [25, 50], // Default range with two numbers
+      humidityNoti: false,
+      humidityRange: [30, 70],
 
-      hurricaneNoti: false,
-      hurricaneRange: [25, 50], // Default range with two numbers
+      seaPressureNoti: false,
+      seaPressureRange: [980, 1050],
 
-      fireNoti: false,
-      fireRange: [25, 50], // Default range with two numbers
+      visibilityNoti: false,
+      visibilityRange: [1, 20],
 
-      airQualityNoti: false,
-      airQualityRange: [25, 50], // Default range with two numbers
+      windSpeedNoti: false,
+      windSpeedRange: [0, 20],
 
-      stormRiskNoti: false,
-      stormRiskRange: [25, 50], // Default range with two numbers
+      rainChanceNoti: false,
+      rainChanceRange: [0, 50],
+
+      rainVolumeNoti: false,
+      rainVolumeRange: [0, 50],
+
       email: [],
     },
   });
 
-  const { resetField } = form;
+  const { resetField, reset } = form;
+
+  // 2. Fetch the user alerts data on component mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const data = await fetchUserAlerts(); // Fetch user alerts from Firestore
+        console.log(data);
+        reset(data); // Reset form with fetched data
+      } catch (error) {
+        toast.error(`Failed to load data: ${(error as Error).message}`);
+      }
+    }
+    loadData();
+  }, [reset]);
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    toast.success('Form submitted successfully');
-    console.log({ ...values });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      // Fetch geolocation
+      const { coords } = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        }
+      );
+
+      // Include city in form data
+      console.log(coords);
+      const response = await fetchCity(coords.latitude, coords.longitude);
+      console.log(response);
+      const formDataWithLocation = {
+        ...values,
+        city: response[0].name,
+      };
+
+      await saveUserAlerts(formDataWithLocation); // Save form data directly to Firestore
+      toast.success('Form submitted successfully');
+    } catch (error) {
+      toast.error(`Failed to submit form: ${(error as Error).message}`);
+    }
   }
 
+  const [isChecked, setIsChecked] = useState(false);
+  const [previousValue, setPreviousValue] = useState(false);
+
   const conditions = [
-    { name: 'temperature', label: 'Temperature', icon: <Thermometer /> },
-    { name: 'spark', label: 'Spark', icon: <Zap /> },
-    { name: 'hurricane', label: 'Hurricane', icon: <Tornado /> },
-    { name: 'fire', label: 'Fire', icon: <Flame /> },
-    { name: 'airQuality', label: 'Air Quality', icon: <Wind /> },
-    { name: 'stormRisk', label: 'Storm Risk', icon: <CloudLightning /> },
+    {
+      name: 'temperature',
+      label: 'Temperature (°C)',
+      icon: <Thermometer />,
+      min: -10,
+      max: 50,
+    },
+    {
+      name: 'humidity',
+      label: 'Humidity (%)',
+      icon: <Droplet />,
+      min: 0,
+      max: 100,
+    },
+    {
+      name: 'seaPressure',
+      label: 'Sea Pressure (hPa)',
+      icon: <Waves />,
+      min: 900,
+      max: 1100,
+    },
+    {
+      name: 'visibility',
+      label: 'Visibility (km)',
+      icon: <Eye />,
+      min: 0,
+      max: 10,
+    },
+    {
+      name: 'windSpeed',
+      label: 'Wind Speed (m/s)',
+      icon: <Wind />,
+      min: 0,
+      max: 40,
+    },
+    {
+      name: 'rainChance',
+      label: 'Rain Chance (%)',
+      icon: <Umbrella />,
+      min: 0,
+      max: 100,
+    },
+    {
+      name: 'rainVolume',
+      label: 'Rain Volume (mm/h)',
+      icon: <Droplets />,
+      min: 0,
+      max: 50,
+    },
   ];
 
   return (
@@ -111,12 +202,12 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                   <div className="mr-12">WEATHER CONDITION</div>
                 </th>
                 <th>Notification</th>
-                <th>Condition Range</th>
-                <th>Auto</th>
+                <th>Acceptable Range</th>
+                <th>Default</th>
               </tr>
             </thead>
             <tbody>
-              {conditions.map(({ name, label, icon }) => (
+              {conditions.map(({ name, label, icon, min, max }) => (
                 <tr
                   key={name}
                   className="border-b-2 h-16"
@@ -161,8 +252,8 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                               onValueChange={(val) =>
                                 field.onChange(val as [number, number])
                               }
-                              max={100}
-                              min={0}
+                              max={max}
+                              min={min}
                               step={1}
                               minStepsBetweenThumbs={0}
                             />
@@ -177,11 +268,7 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                       <FormControl>
                         <Button
                           type="reset"
-                          onClick={() =>
-                            resetField(
-                              `${name}Range` as keyof z.infer<typeof formSchema>
-                            )
-                          }
+                          onClick={() => resetField(name + 'Range')}
                         >
                           Default
                         </Button>
