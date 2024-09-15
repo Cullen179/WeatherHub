@@ -19,30 +19,48 @@ export default function WeatherProvider({
   const [forecastData, setForecastData] = useState(null);
   const [geoLocation, setGeoLocation] = useState<geoLocation | null>(null);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
+    // Function to fetch data
+    const fetchData = async (latitude: number, longitude: number) => {
+      try {
+        const weatherData = await fetchWeatherData(latitude, longitude);
+        const forecastData = await fetchForecastData(latitude, longitude);
+        setWeatherData(weatherData);
+        setForecastData(forecastData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
-          const weatherData = await fetchWeatherData(latitude, longitude);
-          const forecastData = await fetchForecastData(latitude, longitude);
-
-          await Promise.all([weatherData, forecastData]);
-
-          setWeatherData((w) => weatherData);
-          setForecastData((f) => forecastData);
-          setGeoLocation({ latitude, longitude });
-
-        },
-        (error) => {
-          console.error('Error getting location:', error);
+    useEffect(() => {
+      if (typeof window !== 'undefined') {
+        // Make sure the browser environment is available
+  
+        if (geoLocation) {
+          const { latitude, longitude } = geoLocation;
+          fetchData(latitude, longitude);
+        } else if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const { latitude, longitude } = position.coords;
+              setGeoLocation({ latitude, longitude });
+  
+              const weatherData = await fetchWeatherData(latitude, longitude);
+              const forecastData = await fetchForecastData(latitude, longitude);
+  
+              await Promise.all([weatherData, forecastData]);
+  
+              setWeatherData((w) => weatherData);
+              setForecastData((f) => forecastData);
+            },
+            (error) => {
+              console.error('Error getting location:', error);
+            }
+          );
         }
-      );
     } else {
       console.error('Geolocation is not supported');
     }
-  }, []);
+  }, [geoLocation]);
 
   return (
     <WeatherContext.Provider value={{ weatherData, forecastData, geoLocation, setGeoLocation }}>
