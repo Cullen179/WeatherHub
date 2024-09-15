@@ -7,7 +7,7 @@ export async function fetchWeatherData(lat: number, lon: number) {
     throw new Error('OpenWeather API key is not set');
   }
 
-  const baseUrl = `http://api.openweathermap.org/data/2.5/weather`;
+  const baseUrl = `https://api.openweathermap.org/data/2.5/weather`;
   const url = `${baseUrl}?lat=${lat.toFixed(1)}&lon=${lon.toFixed(1)}&appid=${apiKey}&units=metric`;
   console.log(url);
 
@@ -32,7 +32,7 @@ export async function fetchForecastData(
     throw new Error('OpenWeather API key is not set');
   }
 
-  const baseUrl = `http://api.openweathermap.org/data/2.5/forecast`;
+  const baseUrl = `https://api.openweathermap.org/data/2.5/forecast`;
   let url;
 
   if (city !== undefined) {
@@ -59,7 +59,7 @@ export async function fetchCity(lat: number, lon: number) {
     throw new Error('OpenWeather API key is not set');
   }
 
-  const baseUrl = `http://api.openweathermap.org/geo/1.0/reverse`;
+  const baseUrl = `https://api.openweathermap.org/geo/1.0/reverse`;
   const url = `${baseUrl}?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
   const response = await fetch(url)
