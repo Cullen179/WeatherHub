@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -16,7 +16,6 @@ import {
 import { z } from 'zod';
 import { Switch } from '@/components/ui/switch';
 
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     Thermometer,
     Droplet,
