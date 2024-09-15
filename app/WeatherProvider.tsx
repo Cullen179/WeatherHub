@@ -28,10 +28,7 @@ export default function WeatherProvider({
           const weatherData = await fetchWeatherData(latitude, longitude);
           const forecastData = await fetchForecastData(latitude, longitude);
 
-          if (user) await saveLocation(user.id, forecastData.city.name, latitude, longitude);
-
           await Promise.all([weatherData, forecastData]);
-
 
           setWeatherData((w) => weatherData);
           setForecastData((f) => forecastData);
