@@ -1,6 +1,6 @@
 'use client';
 import { WeatherContext } from '@/hooks/WeatherContext';
-import { fetchForecastData, fetchWeatherData, saveLocation } from './fetch';
+import { fetchForecastData, fetchWeatherData } from './fetch';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import AIChatButton from '@/components/AI/AIChatBoxButton';
