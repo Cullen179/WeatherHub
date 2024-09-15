@@ -17,7 +17,7 @@ export default function WeatherProvider({
 }>) {
   const [weatherData, setWeatherData] = useState(null);
   const [forecastData, setForecastData] = useState(null);
-  const { user } = useUser();
+  const [geoLocation, setGeoLocation] = useState<geoLocation | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'geolocation' in navigator) {
@@ -32,6 +32,7 @@ export default function WeatherProvider({
 
           setWeatherData((w) => weatherData);
           setForecastData((f) => forecastData);
+          setGeoLocation({ latitude, longitude });
 
         },
         (error) => {
@@ -41,10 +42,10 @@ export default function WeatherProvider({
     } else {
       console.error('Geolocation is not supported');
     }
-  }, [user]);
+  }, []);
 
   return (
-    <WeatherContext.Provider value={{ weatherData, forecastData }}>
+    <WeatherContext.Provider value={{ weatherData, forecastData, geoLocation, setGeoLocation }}>
       {children}
       <AIChatButton />
     </WeatherContext.Provider>
