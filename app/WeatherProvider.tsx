@@ -2,6 +2,8 @@
 import { WeatherContext } from '@/hooks/WeatherContext';
 import { fetchForecastData, fetchWeatherData } from './fetch';
 import { useEffect, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import AIChatButton from '@/components/AI/AIChatBoxButton';
 
 interface geoLocation {
   latitude: number;
@@ -15,7 +17,7 @@ export default function WeatherProvider({
 }>) {
   const [weatherData, setWeatherData] = useState(null);
   const [forecastData, setForecastData] = useState(null);
-  // const [geoLocation, setGeoLocation] = useState<geoLocation | null>(null);
+  const [geoLocation, setGeoLocation] = useState<geoLocation | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'geolocation' in navigator) {
@@ -30,6 +32,7 @@ export default function WeatherProvider({
 
           setWeatherData((w) => weatherData);
           setForecastData((f) => forecastData);
+          setGeoLocation({ latitude, longitude });
 
         },
         (error) => {
@@ -42,8 +45,9 @@ export default function WeatherProvider({
   }, []);
 
   return (
-    <WeatherContext.Provider value={{ weatherData, forecastData }}>
+    <WeatherContext.Provider value={{ weatherData, forecastData, geoLocation, setGeoLocation }}>
       {children}
+      <AIChatButton />
     </WeatherContext.Provider>
   );
 }
