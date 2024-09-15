@@ -17,13 +17,25 @@ export default function NavigationBar() {
         <Typography variant="h2">WeatherHub</Typography>
       </div>
       <div className="space-x-2 flex justify-between items-center">
-        {['dashboard', 'map', 'alert', 'trip-planning'].map((item) => (
+        {[{
+          name: 'Dashboard',
+          href: '/',
+        }, {
+          name: 'Map',
+          href: '/map',
+        }, {
+          name: 'Alert',
+          href: '/alert',
+        }, {
+          name: 'Trip Planning',
+          href: '/trip-planning',
+        }].map((item) => (
           <Link
-            key={item}
-            href={'/' + item}
+            key={item.name}
+            href={item.href}
             className={buttonVariants({ variant: 'ghost' })}
           >
-            {item.substr(0, 1).toUpperCase() + item.substr(1)}
+            {item.name}
           </Link>
         ))}
 
