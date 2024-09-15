@@ -1,7 +1,9 @@
 'use client';
 import { WeatherContext } from '@/hooks/WeatherContext';
-import { fetchForecastData, fetchWeatherData } from './fetch';
+import { fetchForecastData, fetchWeatherData, saveLocation } from './fetch';
 import { useEffect, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import AIChatButton from '@/components/AI/AIChatBoxButton';
 
 interface geoLocation {
   latitude: number;
@@ -15,7 +17,7 @@ export default function WeatherProvider({
 }>) {
   const [weatherData, setWeatherData] = useState(null);
   const [forecastData, setForecastData] = useState(null);
-  // const [geoLocation, setGeoLocation] = useState<geoLocation | null>(null);
+  const { user } = useUser();
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'geolocation' in navigator) {
@@ -26,7 +28,10 @@ export default function WeatherProvider({
           const weatherData = await fetchWeatherData(latitude, longitude);
           const forecastData = await fetchForecastData(latitude, longitude);
 
+          if (user) await saveLocation(user.id, forecastData.city.name, latitude, longitude);
+
           await Promise.all([weatherData, forecastData]);
+
 
           setWeatherData((w) => weatherData);
           setForecastData((f) => forecastData);
@@ -39,11 +44,12 @@ export default function WeatherProvider({
     } else {
       console.error('Geolocation is not supported');
     }
-  }, []);
+  }, [user]);
 
   return (
     <WeatherContext.Provider value={{ weatherData, forecastData }}>
       {children}
+      <AIChatButton />
     </WeatherContext.Provider>
   );
 }
