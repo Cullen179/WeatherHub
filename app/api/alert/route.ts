@@ -30,7 +30,7 @@ export async function POST() {
           undefined,
           data.city
         );
-        
+        console.log(forecastData);
         processedCities.set(data.city, forecastData);
 
         // Check if the user needs to be notified
@@ -53,16 +53,28 @@ export async function POST() {
           });
         }
       } else {
-        // Use cached forecast data
-        const forecastData = processedCities.get(data.city);
+          // Use cached forecast data
+          const forecastData = processedCities.get(data.city);
 
-        // Check if the user needs to be notified
-        const notifications = checkNotification(data, forecastData.list[0]);
+          // Check if the user needs to be notified
+          const notifications = checkNotification(data, forecastData.list[0]);
 
-        // Add all notifications to the Map
-        if (notifications.length > 0) {
-          dataToNotify.set(data.emails, notifications);
-        }
+          // Add all notifications to the Map
+          // Add user to the list of users that need to be notified
+          if (notifications.length > 0) {
+              dataToNotify.set(data.emails, notifications);
+              const futureTime = new Date(
+                  (forecastData.list[0].dt + forecastData.city.timezone) * 1000
+              );
+              const timeDiff = getHourMinuteDifference(new Date(), futureTime);
+              // add date to result
+              result.push({
+                  emails: data.emails,
+                  conditions: notifications,
+                  time: futureTime.toTimeString(),
+                  timeDiff: timeDiff,
+              });
+          }
       }
     }
   } catch (error) {
@@ -112,36 +124,50 @@ function checkNotification(data: any, forecastData: any): string[] {
 
   // Check if the forecast meets the criteria
   if (
-    temperature < data.temperatures.range[0] ||
-    temperature > data.temperatures.range[1]
+    data.temperatures.noti &&
+    (temperature < data.temperatures.range[0] ||
+    temperature > data.temperatures.range[1])
   ) {
     // Create a EmailNotification object and add it to the notifications array
     notifications.push('Temperature is out of range');
   }
-  if (humidity < data.humidity.range[0] || humidity > data.humidity.range[1]) {
-    notifications.push('Humidity is out of range');
+  if (
+      data.humidity.noti && (
+          humidity < data.humidity.range[0] || humidity > data.humidity.range[1]
+      )
+  ) {
+      notifications.push('Humidity is out of range');
   }
 
   if (
-    seaPressure < data.seaPressure.range[0] ||
-    seaPressure > data.seaPressure.range[1]
+    data.seaPressure.noti &&
+    (seaPressure < data.seaPressure.range[0] ||
+    seaPressure > data.seaPressure.range[1])
   ) {
     notifications.push('Sea pressure is out of range');
   }
 
-  if (visibility < data.visibility.range[0]) {
+  if (
+    data.visibility.noti &&
+    (visibility < data.visibility.range[0])) {
     notifications.push('Visibility is low');
   }
 
-  if (windSpeed > data.windSpeed.range[1]) {
+  if (
+    data.windSpeed.noti &&
+    (windSpeed > data.windSpeed.range[1])) {
     notifications.push('Wind speed is high');
   }
 
-  if (rainChance > data.rainChance.range[1]) {
+  if (
+    data.rainChance.noti &&
+    (rainChance > data.rainChance.range[1])) {
     notifications.push('Rain chance is high');
   }
 
-  if (rainVolume > data.rainVolume.range[1]) {
+  if (
+    data.rainVolume.noti &&
+    (rainVolume > data.rainVolume.range[1])) {
     notifications.push('Rain volume is high');
   }
 
