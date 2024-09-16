@@ -23,13 +23,20 @@ export default function DateRecom({
     function statusColor(status: Status) {
         switch (status) {
             case 'Danger':
-                return 'red-500';
+                return {
+                    text: 'text-red-500',
+                    bg: 'bg-red-500',
+                };
             case 'Moderate':
-                return 'yellow-500';
+                return {
+                    text: 'text-yellow-500',
+                    bg: 'bg-yellow-500',
+                };
             case 'Good':
-                return 'green-500';
-            default:
-                return 'gray-500';
+                return {
+                    text: 'text-green-500',
+                    bg: 'bg-green-500',
+                };
         }
     }
 
@@ -55,7 +62,7 @@ export default function DateRecom({
                             <p
                                 className={cn(
                                     'text-muted-foreground text-xs',
-                                    `text-${statusColor(day.status)}`
+                                    statusColor(day.status).text
                                 )}
                             >
                                 {day.status}
@@ -63,7 +70,7 @@ export default function DateRecom({
                             <span
                                 className={cn(
                                     'flex h-2 w-2 rounded-full',
-                                    `bg-${statusColor(day.status)}`
+                                    statusColor(day.status).bg
                                 )}
                             />
                         </div>
