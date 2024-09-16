@@ -327,13 +327,13 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                     <table className="w-full rounded-md border">
                         <thead className="border-b-[1px] h-16">
                             <tr className="text-xl text-muted-foreground p-3">
-                                <th className="max-w-10">
+                                <th>
                                     <div className="mr-8">
                                         WEATHER CONDITION
                                     </div>
                                 </th>
                                 <th>Notification</th>
-                                <th>Acceptable Range</th>
+                                <th className="w-[40%]">Acceptable Range</th>
                                 <th>Recommended Value</th>
                             </tr>
                         </thead>
