@@ -6,6 +6,7 @@ import {
 import { db } from '@/firebase';
 import { fetchForecastData } from '@/app/fetch';
 import { NextResponse } from 'next/server';
+import Forecast from '@/app/Forecast';
 
 export async function POST() {
   const processedCities = new Map<string, any>(); // Map to store processed cities and their forecast data
@@ -37,14 +38,16 @@ export async function POST() {
         // Add user to the list of users that need to be notified
         if (notifications.length > 0) {
           dataToNotify.set(data.emails, notifications);
+          const timeDiff = getHourMinuteDifference(new Date(), new Date((forecastData.list[0].dt) * 1000));
           // add date to result
           result.push({
             emails: data.emails,
             conditions: notifications,
             time: new Date(
-              (forecastData.list[0].dt + forecastData.city.timezone) *
+              (forecastData.list[0].dt) *
                 1000
-            ),
+            ).toTimeString(),
+            timeDiff: timeDiff,
           });
         }
       } else {
@@ -141,4 +144,15 @@ function checkNotification(data: any, forecastData: any): string[] {
   }
 
   return notifications;
+}
+
+function getHourMinuteDifference(date1: Date, date2: Date): string {
+  let diff = Math.abs(date1.getTime() - date2.getTime());
+  let hours = Math.floor(diff / 1000 / 60 / 60);
+  diff -= hours * 1000 * 60 * 60;
+  let minutes = Math.floor(diff / 1000 / 60);
+  // diff /= 60;
+  let diffStr = hours === 0 ? (minutes + " minute(s)" ): (hours + " hour(s) " + minutes + " minute(s)");
+  return diffStr;
+  // return Math.abs(Math.round(diff));
 }
