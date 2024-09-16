@@ -30,6 +30,7 @@ export async function POST() {
           undefined,
           data.city
         );
+        
         processedCities.set(data.city, forecastData);
 
         // Check if the user needs to be notified
@@ -38,15 +39,16 @@ export async function POST() {
         // Add user to the list of users that need to be notified
         if (notifications.length > 0) {
           dataToNotify.set(data.emails, notifications);
-          const timeDiff = getHourMinuteDifference(new Date(), new Date((forecastData.list[0].dt) * 1000));
+          const futureTime = new Date((forecastData.list[0].dt + forecastData.city.timezone) * 1000);
+          const timeDiff = getHourMinuteDifference(
+              new Date(),
+              futureTime
+          );
           // add date to result
           result.push({
             emails: data.emails,
             conditions: notifications,
-            time: new Date(
-              (forecastData.list[0].dt) *
-                1000
-            ).toTimeString(),
+            time: futureTime.toTimeString(),
             timeDiff: timeDiff,
           });
         }
