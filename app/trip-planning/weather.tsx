@@ -19,12 +19,11 @@ import { fetchForecastData } from '../fetch';
 import { WeatherInfo } from '@/type/weatherInfo';
 import { useState } from 'react';
 import ActivityRecom from './form/ActivityRecom';
-import { count } from 'console';
 import WeatherOverview from './form/WeatherOverview';
 
 const FormSchema = z.object({
     activityDate: z.date({
-        required_error: 'A date of birth is required.',
+        required_error: 'A date is required.',
     }),
     lat: z.number(),
     lon: z.number(),
