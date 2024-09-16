@@ -48,11 +48,20 @@ export default function ActivityRecom({
     function statusColor(status: Status) {
         switch (status) {
             case 'Danger':
-                return 'red-500';
+                return {
+                    text: 'text-red-500',
+                    bg: 'bg-red-500',
+                };
             case 'Moderate':
-                return 'yellow-500';
+                return {
+                    text: 'text-yellow-500',
+                    bg: 'bg-yellow-500',
+                };
             case 'Good':
-                return 'green-500';
+                return {
+                    text: 'text-green-500',
+                    bg: 'bg-green-500',
+                };
         }
     }
 
@@ -75,7 +84,7 @@ export default function ActivityRecom({
                             <p
                                 className={cn(
                                     'text-muted-foreground text-xs',
-                                    `text-${statusColor(recommendation.status)}`
+                                    statusColor(recommendation.status).text
                                 )}
                             >
                                 {recommendation.status}
@@ -83,7 +92,7 @@ export default function ActivityRecom({
                             <span
                                 className={cn(
                                     'flex h-2 w-2 rounded-full',
-                                    `bg-${statusColor(recommendation.status)}`
+                                    statusColor(recommendation.status).bg
                                 )}
                             />
                         </div>
