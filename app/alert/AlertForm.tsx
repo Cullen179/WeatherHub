@@ -120,26 +120,26 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                 reset({
                     temperatureNoti: temperatures.noti,
                     temperatureRange: temperatures.range, // Celsius (0 - 40)
-
+                
                     humidityNoti: humidity.noti,
                     humidityRange: humidity.range, // Percentage (30 - 70)
-
+                
                     seaPressureNoti: seaPressure.noti,
                     seaPressureRange: seaPressure.range, // hPa (980 - 1050)
-
+                
                     visibilityNoti: visibility.noti,
                     visibilityRange: visibility.range, // km (1 - 20)
-
+                
                     windSpeedNoti: windSpeed.noti,
                     windSpeedRange: windSpeed.range, // m/s (0 - 20)
-
+                
                     rainChanceNoti: rainChance.noti,
                     rainChanceRange: rainChance.range, // % (0 - 50)
-
+                
                     rainVolumeNoti: rainVolume.noti,
                     rainVolumeRange: rainVolume.range, // mm (0 - 50)
                     email: emails,
-                }); // Reset form with fetched data
+                }, { keepDefaultValues: true }); // Reset form with fetched data
             } catch (error) {
                 toast.error(`Failed to load data: ${(error as Error).message}`);
             }
