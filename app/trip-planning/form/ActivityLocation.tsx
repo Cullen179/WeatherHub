@@ -1,8 +1,11 @@
+'use client';
 import SearchCity from '@/app/map/SearchCity';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { useWeather } from '@/hooks/WeatherContext';
 import { set } from 'date-fns';
 import { Search } from 'lucide-react';
+import { useState } from 'react';
 import { UseFormSetValue } from 'react-hook-form';
 
 export default function ActivityLocation({
@@ -35,36 +38,29 @@ export default function ActivityLocation({
     const handleCoordinatesFound = (lat: number, lon: number) => {
         setValue('lat', lat);
         setValue('lon', lon);
+        setOpen(false);
+        setGeoLocation({ latitude: lat, longitude: lon });
     };
 
+    const [open, setOpen] = useState(false);
+    const { setGeoLocation } = useWeather();
+
     return (
-        <div className="flex space-x-2">
-            <Button
-                type="button"
-                variant={'outline'}
-                onClick={() => {
-                    // Example usage:
-                    getCurrentLocation()
-                        .then((coords: any) => {
-                            setValue('lat', coords.latitude);
-                            setValue('lon', coords.longitude);
-                        })
-                        .catch((error) => {
-                            console.error('Error:', error);
-                            setValue('lat', 0);
-                            setValue('lon', 0);
-                        });
-                }}
+        <div>
+            <Dialog
+                open={open}
+                onOpenChange={setOpen}
             >
-                Current Location
-            </Button>
-            <Dialog>
                 <DialogTrigger asChild>
-                    <Button type="button">
+                    <Button
+                        type="button"
+                        variant={'outline'}
+                    >
                         <Search />
+                        Search Location
                     </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="w-fit p-10">
                     <SearchCity onCoordinatesFound={handleCoordinatesFound} />
                 </DialogContent>
             </Dialog>
