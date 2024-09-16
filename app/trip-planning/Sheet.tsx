@@ -6,8 +6,7 @@ import { ReactNode } from 'react';
 
 export default function Sheet() {
     const tripParams = [
-        { param: 'weather', component: <Weather /> },
-        { param: 'location', component: <Location /> },
+        { param: 'activity', component: <Weather /> },
         { param: 'date', component: <Date/> },
     ] as { param: string; component: ReactNode }[];
   return (

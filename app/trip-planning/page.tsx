@@ -11,7 +11,7 @@ export default function TripPlanning() {
 
           <div className="w-[65%] relative">
               <div className="flex flex-col absolute w-full h-full">
-                  {/* <WeatherMap showSearch={false} /> */}
+                  <WeatherMap showSearch={false} />
               </div>
           </div>
       </div>

@@ -47,60 +47,57 @@ function recommendActivity(
     switch (activity) {
         case 'Hiking':
             if (
-                temp < 5 ||
-                temp > 30 ||
-                rainProb > 0.5 ||
-                rainVol > 5 ||
-                wind > 15
+                temp < 10 ||
+                temp > 40 ||
+                rainProb > 0.8 ||
+                rainVol > 10 ||
+                wind > 25
             )
                 recommendation = 'Danger';
             else if (
-                clouds > 70 ||
-                temp < 10 ||
-                temp > 25 ||
-                rainProb > 0.3 ||
-                wind > 10
+                temp < 15 ||
+                temp > 35 ||
+                rainProb > 0.7 ||
+                wind > 15
             )
                 recommendation = 'Moderate';
             break;
         case 'Running':
             if (
                 temp < 0 ||
-                temp > 30 ||
-                rainProb > 0.5 ||
-                vis < 5000 ||
-                wind > 20
+                temp > 40 ||
+                rainProb > 0.8 ||
+                wind > 15
             )
                 recommendation = 'Danger';
             else if (
-                clouds > 50 ||
-                temp < 5 ||
-                temp > 25 ||
-                rainProb > 0.2 ||
-                vis < 10000
+                temp < 10 ||
+                temp > 35 ||
+                rainProb > 0.5 ||
+                wind > 10
             )
                 recommendation = 'Moderate';
             break;
         case 'Picnic':
-            if (rainProb > 0.3 || rainVol > 2 || wind > 15)
+            if (rainProb > 0.8 || rainVol > 10 || wind > 20)
                 recommendation = 'Danger';
-            else if (clouds > 60 || rainProb > 0.1 || vis < 8000)
+            else if (clouds > 70 || rainProb > 0.7 || vis < 2000)
                 recommendation = 'Moderate';
             break;
         case 'Stargazing':
-            if (clouds > 20 || wind > 10) recommendation = 'Danger';
-            else if (clouds > 10 || vis < 20000) recommendation = 'Moderate';
+            if (clouds > 80 || vis < 3000) recommendation = 'Danger';
+            else if (clouds > 70 || vis < 5000) recommendation = 'Moderate';
             break;
         case 'Cycling':
-            if (temp < 0 || temp > 35 || rainProb > 0.4 || wind > 25)
+            if (temp < 10 || temp > 40 || rainProb > 0.8 || wind > 15)
                 recommendation = 'Danger';
-            else if (clouds > 70 || rainProb > 0.2 || wind > 15)
+            else if (clouds > 70 || rainProb > 0.7 || wind > 10)
                 recommendation = 'Moderate';
             break;
         case 'Gardening':
-            if (rainProb > 0.6 || rainVol > 10 || wind > 20)
+            if (rainProb > 0.8 || rainVol > 10 || wind > 15)
                 recommendation = 'Danger';
-            else if (temp < 10 || temp > 30 || rainProb > 0.3 || wind > 15)
+            else if (temp < 10 || temp > 35 || rainProb > 0.7 || wind > 10)
                 recommendation = 'Moderate';
             break;
     }

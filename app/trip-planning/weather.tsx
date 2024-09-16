@@ -19,11 +19,11 @@ import { fetchForecastData } from '../fetch';
 import { WeatherInfo } from '@/type/weatherInfo';
 import { useState } from 'react';
 import ActivityRecom from './form/ActivityRecom';
-import { count } from 'console';
+import WeatherOverview from './form/WeatherOverview';
 
 const FormSchema = z.object({
     activityDate: z.date({
-        required_error: 'A date of birth is required.',
+        required_error: 'A date is required.',
     }),
     lat: z.number(),
     lon: z.number(),
@@ -50,35 +50,42 @@ export default function Weather() {
             return;
         }
 
-        const overview = weatherData.list.reduce((acc: any, item: any) => {
-            const date = item.dt_txt.split(' ')[0];
+        const overview = weatherData.list.reduce(
+            (acc: any, item: any) => {
+                const date = item.dt_txt.split(' ')[0];
 
-            if (date !== activityDate) {
-                return acc;
-            }
-            WeatherInfo.forEach((key) => {
-                !acc[key.variablePath + (key.subPath ? key.subPath : '')] &&
-                    (acc[key.variablePath + (key.subPath ? key.subPath : '')] =
-                        0);
-
-                if (!item[key.variablePath]) {
-                    return;
+                if (date !== activityDate) {
+                    return acc;
                 }
+                WeatherInfo.forEach((key) => {
+                    !acc[key.variablePath + (key.subPath ? key.subPath : '')] &&
+                        (acc[
+                            key.variablePath + (key.subPath ? key.subPath : '')
+                        ] = 0);
 
-                acc[key.variablePath + (key.subPath ? key.subPath : '')] +=
-                    key.subPath
-                        ? item[key.variablePath][key.subPath]
-                        : item[key.variablePath];
-            });
+                    if (!item[key.variablePath]) {
+                        return;
+                    }
 
-            acc.count+= 1;
-            return acc;
-        }, {count: 0, activityDate: activityDate});
+                    acc[key.variablePath + (key.subPath ? key.subPath : '')] +=
+                        key.subPath
+                            ? item[key.variablePath][key.subPath]
+                            : item[key.variablePath];
+                });
+
+                acc.count += 1;
+                return acc;
+            },
+            { count: 0, activityDate: activityDate }
+        );
 
         Object.keys(overview).forEach((key: any) => {
-            (key != 'count' && typeof overview[key] === 'number') &&
-            (overview[key] /= overview.count);
+            key != 'count' &&
+                typeof overview[key] === 'number' &&
+                (overview[key] /= overview.count);
         });
+
+        // console.log(overview)
 
         setWeatherOverview(overview);
     }
@@ -135,7 +142,10 @@ export default function Weather() {
                 <Button type="submit">Find Activities</Button>
             </form>
             {weatherOverview.activityDate && (
-                <ActivityRecom weatherOverview={weatherOverview} />
+                <>
+                    <WeatherOverview weatherOverview={weatherOverview} />
+                    <ActivityRecom weatherOverview={weatherOverview} />
+                </>
             )}
         </Form>
     );

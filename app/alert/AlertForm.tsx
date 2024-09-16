@@ -24,6 +24,7 @@ import {
     Wind,
     Droplets,
     Umbrella,
+    Info,
 } from 'lucide-react';
 
 import { Toaster, toast } from 'sonner';
@@ -32,6 +33,12 @@ import { InputTags } from '@/components/ui/emailTags';
 import { Slider } from '@/components/ui/slider';
 import { fetchUserAlerts, saveUserAlerts } from './action';
 import { fetchCity } from '../fetch';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const formSchema = z.object({
     temperatureNoti: z.boolean().default(false).optional(),
@@ -69,25 +76,25 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
         resolver: zodResolver(formSchema),
         defaultValues: {
             temperatureNoti: false,
-            temperatureRange: [0, 40],
+            temperatureRange: [18, 35],
 
             humidityNoti: false,
-            humidityRange: [30, 70],
+            humidityRange: [40, 60],
 
             seaPressureNoti: false,
             seaPressureRange: [980, 1050],
 
             visibilityNoti: false,
-            visibilityRange: [1, 20],
+            visibilityRange: [5, 10],
 
             windSpeedNoti: false,
-            windSpeedRange: [0, 20],
+            windSpeedRange: [0, 10],
 
             rainChanceNoti: false,
-            rainChanceRange: [0, 50],
+            rainChanceRange: [0, 30],
 
             rainVolumeNoti: false,
-            rainVolumeRange: [0, 50],
+            rainVolumeRange: [0, 5],
 
             email: [],
         },
@@ -99,9 +106,40 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
     useEffect(() => {
         async function loadData() {
             try {
-                const data = await fetchUserAlerts(); // Fetch user alerts from Firestore
-                console.log(data);
-                reset(data); // Reset form with fetched data
+                const {
+                    emails,
+                    humidity,
+                    rainChance,
+                    rainVolume,
+                    seaPressure,
+                    temperatures,
+                    visibility,
+                    windSpeed,
+                } = await fetchUserAlerts(); // Fetch user alerts from Firestore
+                
+                reset({
+                    temperatureNoti: temperatures.noti,
+                    temperatureRange: temperatures.range, // Celsius (0 - 40)
+
+                    humidityNoti: humidity.noti,
+                    humidityRange: humidity.range, // Percentage (30 - 70)
+
+                    seaPressureNoti: seaPressure.noti,
+                    seaPressureRange: seaPressure.range, // hPa (980 - 1050)
+
+                    visibilityNoti: visibility.noti,
+                    visibilityRange: visibility.range, // km (1 - 20)
+
+                    windSpeedNoti: windSpeed.noti,
+                    windSpeedRange: windSpeed.range, // m/s (0 - 20)
+
+                    rainChanceNoti: rainChance.noti,
+                    rainChanceRange: rainChance.range, // % (0 - 50)
+
+                    rainVolumeNoti: rainVolume.noti,
+                    rainVolumeRange: rainVolume.range, // mm (0 - 50)
+                    email: emails,
+                }); // Reset form with fetched data
             } catch (error) {
                 toast.error(`Failed to load data: ${(error as Error).message}`);
             }
@@ -135,16 +173,32 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
         }
     }
 
-    const [isChecked, setIsChecked] = useState(false);
-    const [previousValue, setPreviousValue] = useState(false);
-
-    const conditions = [
+    const conditions: {
+        name: string;
+        label: string;
+        icon: JSX.Element;
+        min: number;
+        max: number;
+        tooltip: JSX.Element;
+    }[] = [
         {
             name: 'temperature',
             label: 'Temperature (°C)',
             icon: <Thermometer />,
             min: -10,
             max: 50,
+            tooltip: (
+                <div>
+                    <h3>
+                        <Thermometer /> Temperature (°C)
+                    </h3>
+                    <p>Safe Range: 18°C to 35°C</p>
+                    <p>
+                        <strong>Danger:</strong> Below -18°C (hypothermia risk)
+                        or above 35°C (heatstroke risk)
+                    </p>
+                </div>
+            ),
         },
         {
             name: 'humidity',
@@ -152,6 +206,19 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
             icon: <Droplet />,
             min: 0,
             max: 100,
+            tooltip: (
+                <div>
+                    <h3>
+                        <Droplet /> Humidity (%)
+                    </h3>
+                    <p>Safe Range: 40% to 60%</p>
+                    <p>
+                        <strong>Danger:</strong> High humidity (&gt;80%)
+                        increases the risk of heat-related illnesses, low
+                        humidity (&lt; 20%) may cause dehydration.
+                    </p>
+                </div>
+            ),
         },
         {
             name: 'seaPressure',
@@ -159,6 +226,19 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
             icon: <Waves />,
             min: 900,
             max: 1100,
+            tooltip: (
+                <div>
+                    <h3>
+                        <Waves /> Sea Pressure (hPa)
+                    </h3>
+                    <p>Safe Range: 900 hPa to 1050 hPa</p>
+                    <p>
+                        <strong>Danger:</strong> Sea pressure below 900 hPa may
+                        indicate severe weather conditions (e.g., storms or
+                        hurricanes).
+                    </p>
+                </div>
+            ),
         },
         {
             name: 'visibility',
@@ -166,6 +246,19 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
             icon: <Eye />,
             min: 0,
             max: 10,
+            tooltip: (
+                <div>
+                    <h3>
+                        <Eye /> Visibility (km)
+                    </h3>
+                    <p>Safe Range: 5 km to 10 km</p>
+                    <p>
+                        <strong>Danger:</strong> Visibility below 1 km may lead
+                        to dangerous driving conditions and increase the risk of
+                        accidents.
+                    </p>
+                </div>
+            ),
         },
         {
             name: 'windSpeed',
@@ -173,6 +266,18 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
             icon: <Wind />,
             min: 0,
             max: 40,
+            tooltip: (
+                <div>
+                    <h3>
+                        <Wind /> Wind Speed (m/s)
+                    </h3>
+                    <p>Safe Range: 0 m/s to 10 m/s</p>
+                    <p>
+                        <strong>Danger:</strong> Wind speeds above 20 m/s can
+                        cause significant damage and pose safety risks.
+                    </p>
+                </div>
+            ),
         },
         {
             name: 'rainChance',
@@ -180,6 +285,19 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
             icon: <Umbrella />,
             min: 0,
             max: 100,
+            tooltip: (
+                <div>
+                    <h3>
+                        <Umbrella /> Rain Chance (%)
+                    </h3>
+                    <p>Safe Range: 0% to 30%</p>
+                    <p>
+                        <strong>Danger:</strong> Rain chances above 80% indicate
+                        a strong likelihood of heavy precipitation, which could
+                        lead to flooding.
+                    </p>
+                </div>
+            ),
         },
         {
             name: 'rainVolume',
@@ -187,32 +305,44 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
             icon: <Droplets />,
             min: 0,
             max: 50,
+            tooltip: (
+                <div>
+                    <h3>
+                        <Droplets /> Rain Volume (mm/h)
+                    </h3>
+                    <p>Safe Range: 0 mm/h to 5 mm/h</p>
+                    <p>
+                        <strong>Danger:</strong> Rain volume above 30 mm/h could
+                        lead to flash flooding or other dangerous conditions.
+                    </p>
+                </div>
+            ),
         },
     ];
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="">
+                <div>
                     <table className="w-full rounded-md border">
-                        <thead className="border-b-2 h-16">
+                        <thead className="border-b-[1px] h-16">
                             <tr className="text-xl text-muted-foreground p-3">
-                                <th className="max-w-12">
-                                    <div className="mr-12">
+                                <th className="max-w-10">
+                                    <div className="mr-8">
                                         WEATHER CONDITION
                                     </div>
                                 </th>
                                 <th>Notification</th>
                                 <th>Acceptable Range</th>
-                                <th>Default Value</th>
+                                <th>Recommended Value</th>
                             </tr>
                         </thead>
                         <tbody>
                             {conditions.map(
-                                ({ name, label, icon, min, max }) => (
+                                ({ name, label, icon, min, max, tooltip }) => (
                                     <tr
                                         key={name}
-                                        className="border-b-2 h-16"
+                                        className="border-b-[1px] h-16"
                                     >
                                         <td className="">
                                             <div className="flex">
@@ -220,6 +350,24 @@ const AlertForm: FC<AlertSettingFormProps> = () => {
                                                     <div className="flex content-center items-center gap-1 ml-14">
                                                         <span>{icon}</span>
                                                         {label}
+                                                        <TooltipProvider
+                                                            delayDuration={100}
+                                                        >
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <Info
+                                                                        size={
+                                                                            12
+                                                                        }
+                                                                    />
+                                                                </TooltipTrigger>
+                                                                <TooltipContent className="max-w-[300px]">
+                                                                    {tooltip}
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
                                                     </div>
                                                 </FormLabel>
                                             </div>
