@@ -70,7 +70,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
         />
       </Button>
 
-      <div className="flex h-[450px] flex-col bg-[rgba(32,32,32,0.9)] rounded-2xl pt-11">
+      <div className="flex h-[450px] flex-col bg-background rounded-2xl pt-11">
         <div
           className="mt-3 h-full overflow-y-auto px-4"
           ref={scrollRef}
