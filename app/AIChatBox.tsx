@@ -62,7 +62,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
         onClick={onClose}
         variant="ghost"
         size="icon"
-        className="absolute right-3 top-3 rounded-full hover:rounded-full hover:bg-foreground"
+        className="absolute right-3 top-3 rounded-full"
       >
         <X
           size={18}
