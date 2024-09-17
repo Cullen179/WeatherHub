@@ -13,21 +13,23 @@ export default function ChatMessage({
   const isAiMessage = role === 'assistant';
 
   return (
-    <div
-      className={cn(
-        'mb-3 flex items-center text-sm',
-        isAiMessage ? 'me-5 justify-start' : 'ms-5 justify-end'
-      )}
-    >
-      {isAiMessage && <Bot className="mr-2 shrink-0 stroke-foreground" />}
-      <p
-        className={cn(
-          'text-background px-4 py-2',
-          !isAiMessage && 'rounded bg-foreground'
-        )}
+      <div
+          className={cn(
+              'mb-3 flex items-center text-sm',
+              isAiMessage ? 'me-5 justify-start' : 'ms-5 justify-end'
+          )}
       >
-        {content}
-      </p>
-    </div>
+          {isAiMessage && <Bot className="mr-2 shrink-0 stroke-foreground" />}
+          <p
+              className={cn(
+                  'text-background px-4 py-2 rounded',
+                  !isAiMessage
+                      ? 'bg-foreground'
+                      : 'text-foreground bg-background border'
+              )}
+          >
+              {content}
+          </p>
+      </div>
   );
 }
